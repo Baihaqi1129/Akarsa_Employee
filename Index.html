@@ -1,0 +1,1340 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <title>Akarsa Employee & HRIS</title>
+  
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+  <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    @keyframes scanAnim {
+      0% { top: 0; }
+      50% { top: 100%; }
+      100% { top: 0; }
+    }
+    #reader__dashboard { display: none !important; }
+    #reader video { object-fit: cover !important; }
+  </style>
+</head>
+<body>
+
+  <div id="loginSection">
+    <div class="glass-card">
+      <div class="app-logo">
+        <div class="logo-icon">A</div>
+        <div class="app-name">Akarsa Employee</div>
+      </div>
+      <div>
+        <div class="mb-3">
+          <label class="form-label">ID/NIK Karyawan</label>
+          <input type="text" id="nik" class="form-control" placeholder="Ketik NIK Anda...">
+        </div>
+        <div class="mb-2">
+          <label class="form-label">PIN Akses</label>
+          <div class="input-group">
+            <input type="password" id="pin" class="form-control" placeholder="Masukkan PIN...">
+            <span class="input-group-text" onclick="togglePassword()"><i class="bi bi-eye-slash" id="toggleIcon"></i></span>
+          </div>
+        </div>
+        <div class="login-options">
+          <div class="form-check">
+            <input class="form-check-input" type="checkbox" id="rememberMe">
+            <label class="form-check-label" for="rememberMe">Ingat Saya</label>
+          </div>
+          <a href="#" class="help-link">Bantuan Login?</a>
+        </div>
+        <button type="button" class="btn-login" id="btnMasuk" onclick="prosesLogin()">MASUK SISTEM</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="dashboardKaryawan" style="display: none; padding-bottom: 30px; background-color: #f8f9fa; min-height: 100vh;">
+    <div class="id-card-container pt-4 position-relative">
+      <div class="id-card shadow">
+        <h2 class="user-name" id="namaKaryawan">Memuat Nama...</h2>
+        <p class="user-role" id="jabatanKaryawan">Memuat Jabatan...</p>
+        <div class="card-footer-info">
+          <span id="nikKaryawan">NIK: -</span>
+          <span>PT. Akarsa Garment</span>
+        </div>
+      </div>
+      <div class="position-absolute d-flex align-items-center gap-2" style="top: 15px; right: 15px; z-index: 10;">
+        <button class="btn btn-sm position-relative d-flex justify-content-center align-items-center shadow-none" onclick="bukaNotifikasi()" title="Notifikasi" style="width: 38px; height: 38px; background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.3); border-radius: 50%; backdrop-filter: blur(4px); transition: 0.2s;">
+          <i class="bi bi-bell-fill text-white" style="font-size: 1.1rem;"></i>
+          <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-warning text-dark border border-2 border-danger" id="badgeNotif" style="font-size: 9px; padding: 3px 5px; margin-top: 5px; margin-left: -5px;">2</span>
+        </button>
+        <button class="btn btn-sm d-flex justify-content-center align-items-center shadow-none" onclick="logout()" title="Keluar" style="width: 38px; height: 38px; background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.3); border-radius: 50%; backdrop-filter: blur(4px); transition: 0.2s;">
+          <i class="bi bi-box-arrow-right text-white" style="font-size: 1.2rem;"></i>
+        </button>
+      </div>
+    </div> 
+    
+    <div class="menu-container mt-2">
+      <h3 class="section-title mb-3" style="font-size: 16px; font-weight: 700; color: #444;">Menu Utama</h3>
+      <div class="menu-card" onclick="bukaSubMenu('presensi')">
+        <div class="menu-icon" style="color: #ea384d; background: rgba(234, 56, 77, 0.1);"><i class="bi bi-calendar-check"></i></div>
+        <div style="flex-grow: 1;">
+          <div class="menu-title">PRESENSI REGULER</div>
+          <p class="menu-desc">Absen Scan QR, detail & riwayat harian</p>
+        </div>
+        <i class="bi bi-chevron-right text-muted"></i>
+      </div>
+      <div class="menu-card" onclick="bukaSubMenu('profil')">
+        <div class="menu-icon" style="color: #3b82f6; background: rgba(59, 130, 246, 0.1);"><i class="bi bi-person-badge"></i></div>
+        <div style="flex-grow: 1;">
+          <div class="menu-title">PROFIL KARYAWAN</div>
+          <p class="menu-desc">Informasi data diri & sisa cuti</p>
+        </div>
+        <i class="bi bi-chevron-right text-muted"></i>
+      </div>
+      <div class="menu-card" onclick="bukaSubMenu('pengajuan')">
+        <div class="menu-icon" style="color: #f59e0b; background: rgba(245, 158, 11, 0.1);"><i class="bi bi-file-earmark-text"></i></div>
+        <div style="flex-grow: 1;">
+          <div class="menu-title">PENGAJUAN HR</div>
+          <p class="menu-desc">Formulir izin, cuti, & sakit</p>
+        </div>
+        <i class="bi bi-chevron-right text-muted"></i>
+      </div>
+    </div>
+  </div> 
+  
+  <div id="panelNotifikasi" style="display: none; position: fixed; top: 0; right: 0; width: 100%; max-width: 400px; height: 100vh; background-color: #f8f9fa; z-index: 9999; flex-direction: column; box-shadow: -5px 0 25px rgba(0,0,0,0.15); transition: transform 0.3s ease-in-out;">
+    <div class="p-3 d-flex justify-content-between align-items-center bg-white border-bottom">
+      <h6 class="mb-0 fw-bold text-dark" style="font-size: 16px;"><i class="bi bi-bell-fill text-danger me-2"></i>Kotak Masuk HRD</h6>
+      <button class="btn btn-sm btn-light rounded-circle" onclick="tutupNotifikasi()"><i class="bi bi-x-lg text-dark"></i></button>
+    </div>
+    <div class="p-3 overflow-auto" style="flex-grow: 1;" id="listNotifikasi"></div>
+  </div>
+
+  <div id="subMenuPresensi" style="display: none; padding-bottom: 30px; background-color: #f8f9fa; min-height: 100vh;">
+    <div class="top-header" style="border-bottom: 1px solid #eee; background: white;">
+      <div class="header-icons"><i class="bi bi-arrow-left fs-4" onclick="kembaliKeDashboard()" style="cursor: pointer;"></i></div>
+      <div class="header-title" style="font-size: 16px; color: #444; font-weight: bold;">Menu Presensi</div>
+      <div style="width: 24px;"></div>
+    </div>
+    <div class="container mt-4">
+      <div class="bg-white p-4 rounded-4 shadow-sm border border-light">
+        <div class="d-flex justify-content-between align-items-end mb-3">
+          <h6 class="fw-bold mb-0 text-dark" style="font-size: 16px;">Presensi Hari Ini</h6>
+          <i class="bi bi-calendar-check fs-4 text-primary"></i>
+        </div>
+        <div class="row g-3 mb-4">
+          <div class="col-6">
+            <div class="card-absen bg-pastel-green" onclick="mulaiScanner('masuk')">
+              <div class="icon-gradient-lg grad-green"><i class="bi bi-box-arrow-in-down-left"></i></div>
+              <div class="text-center fw-bold text-dark" style="font-size: 14px;">MASUK</div>
+            </div>
+          </div>
+          <div class="col-6">
+            <div class="card-absen bg-pastel-blue" onclick="mulaiScanner('keluar')">
+              <div class="icon-gradient-lg grad-blue"><i class="bi bi-box-arrow-up-right"></i></div>
+              <div class="text-center fw-bold text-dark" style="font-size: 14px;">KELUAR</div>
+            </div>
+          </div>
+        </div>
+        <h6 class="fw-bold mb-3 text-dark" style="font-size: 16px;">Presensi Dinas Luar</h6>
+        <div class="row g-3 mb-4">
+          <div class="col-6">
+            <div class="card-dinas bg-pastel-green" onclick="absenDinasLuar('masuk')">
+              <i class="bi bi-geo-alt-fill icon-dinas" style="color: #059669;"></i>
+              <div class="text-dinas">Masuk<br>Dinas</div>
+            </div>
+          </div>
+          <div class="col-6">
+            <div class="card-dinas bg-pastel-blue" onclick="absenDinasLuar('keluar')">
+              <i class="bi bi-geo-alt-fill icon-dinas" style="color: #2563eb;"></i>
+              <div class="text-dinas">Keluar<br>Dinas</div>
+            </div>
+          </div>
+        </div>
+        <h6 class="fw-bold mb-3 text-dark" style="font-size: 16px;">Detail Presensi</h6>
+        <div class="list-presensi" onclick="bukaRiwayatAbsen()">
+          <div class="icon-list grad-orange"><i class="bi bi-clock-history"></i></div>
+          <span class="fw-bold text-dark" style="font-size: 14px;">Riwayat & Rekap</span>
+          <i class="bi bi-chevron-right ms-auto text-muted"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="subMenuProfil" style="display: none; padding-bottom: 30px; padding-left: 15px; padding-right: 15px; padding-top: 20px;">
+    
+    <div class="d-flex align-items-center mb-3">
+      <button class="btn btn-light me-3 shadow-sm rounded-circle d-flex justify-content-center align-items-center" onclick="kembaliKeDashboard()" style="width:38px; height:38px;"><i class="bi bi-arrow-left"></i></button>
+      <h5 class="mb-0 text-dark fw-bold" style="font-size: 17px;">Profil Karyawan</h5>
+    </div>
+    
+    <div id="alertNotifikasi" class="alert alert-danger d-flex align-items-start mb-3 shadow-sm rounded-4" style="display: none !important;" role="alert">
+      <i class="bi bi-exclamation-triangle-fill flex-shrink-0 me-3 fs-3 mt-1"></i>
+      <div>
+        <h6 class="alert-heading mb-1 fw-bold" id="judulNotif">Peringatan</h6>
+        <div id="isiNotif" class="mb-1" style="font-size: 13px;">Pemberitahuan.</div>
+        <div id="detailNotif" style="font-size: 11px; opacity: 0.8;"></div>
+      </div>
+    </div>
+
+    <div class="card border-0 rounded-4 overflow-hidden mb-4 shadow-sm" style="background: linear-gradient(135deg, #1e3a8a, #3b82f6);">
+      <div class="card-body text-center p-4 position-relative">
+        <span class="badge bg-success position-absolute top-0 end-0 m-3 px-3 py-2 rounded-pill shadow-sm" id="profStatusAktif" style="font-size: 11px;">Aktif</span>
+        
+        <div class="position-relative d-inline-block mb-3 mt-2">
+          <img id="profImg" src="" alt="Profil" class="rounded-circle shadow" style="width: 110px; height: 110px; object-fit: cover; border: 4px solid #ffffff; background-color: #f8f9fa;">
+        </div>
+        <h4 class="mb-1 fw-bold text-white" id="profNama" style="font-size: 18px;">Nama Karyawan</h4>
+        <div class="text-white-50 fw-bold mb-3" style="font-size: 13px;" id="profNik">NIK: -</div>
+        
+        <div class="d-flex justify-content-center gap-2 flex-wrap mb-1">
+           <span class="badge bg-white text-primary px-3 py-2 rounded-pill shadow-sm" id="profDivisi" style="font-size: 11px;">-</span>
+           <span class="badge bg-white text-primary px-3 py-2 rounded-pill shadow-sm" id="profJabatanGrade" style="font-size: 11px;">-</span>
+        </div>
+      </div>
+      <div class="bg-white p-3 d-flex justify-content-around text-center border-top">
+         <div style="flex: 1;">
+           <div class="text-muted mb-1" style="font-size: 10px; font-weight: 700;">MASA KERJA</div>
+           <div class="fw-bold text-dark" id="profMasaKerja" style="font-size: 11px;">-</div>
+         </div>
+         <div class="border-start"></div>
+         <div style="flex: 1;">
+           <div class="text-muted mb-1" style="font-size: 10px; font-weight: 700;">STATUS</div>
+           <div class="fw-bold text-dark" id="profStatusKaryawan" style="font-size: 11px;">-</div>
+         </div>
+         <div class="border-start"></div>
+         <div style="flex: 1;">
+           <div class="text-muted mb-1" style="font-size: 10px; font-weight: 700;">KONTRAK</div>
+           <div class="fw-bold text-dark" id="profKontrak" style="font-size: 11px;">-</div>
+         </div>
+      </div>
+    </div>
+
+    <h6 class="text-muted small fw-bold mb-2 ps-1 text-uppercase" style="font-size: 11px;"><i class="bi bi-stars me-2 text-warning fs-6"></i>Cuti & Karir</h6>
+    <div class="card border-0 shadow-sm rounded-4 mb-4 overflow-hidden">
+      <div class="card-body p-3">
+        <div class="d-flex justify-content-between align-items-center border-bottom pb-3 mb-3 mt-1">
+          <span class="text-muted fw-bold" style="font-size: 12px;">Sisa Cuti Tahunan</span>
+          <span class="badge bg-primary px-3 py-2 rounded-pill shadow-sm" id="profCuti" style="font-size: 14px;">- Hari</span>
+        </div>
+         <button class="btn btn-outline-primary w-100 rounded-pill fw-bold" style="font-size: 12px;" onclick="bukaTimelineKarir()"><i class="bi bi-clock-history me-2"></i>Lihat Jejak Karir (Mutasi)</button>
+      </div>
+    </div>
+
+    <h6 class="text-muted small fw-bold mb-2 ps-1 text-uppercase" style="font-size: 11px;"><i class="bi bi-person-vcard-fill me-2 text-info fs-6"></i>Data Kependudukan</h6>
+    <div class="card border-0 shadow-sm rounded-4 mb-4 overflow-hidden">
+      <div class="list-group list-group-flush" style="font-size: 12px;">
+        <div class="list-group-item d-flex justify-content-between p-3"><span class="text-muted">NIK KTP</span><strong id="profNikKtp" class="text-end">-</strong></div>
+        <div class="list-group-item d-flex justify-content-between p-3 bg-light"><span class="text-muted">Tempat, Tgl Lahir</span><strong id="profTtl" class="text-end">-</strong></div>
+        <div class="list-group-item d-flex justify-content-between p-3"><span class="text-muted">Jenis Kelamin</span><strong id="profKelamin" class="text-end">-</strong></div>
+        <div class="list-group-item d-flex justify-content-between p-3 bg-light"><span class="text-muted">Agama & Status</span><strong id="profAgamaNikah" class="text-end">-</strong></div>
+        <div class="list-group-item p-3"><span class="text-muted d-block mb-1">Alamat Sesuai KTP</span><strong id="profAlamat" class="d-block" style="line-height: 1.4;">-</strong></div>
+      </div>
+    </div>
+
+    <h6 class="text-muted small fw-bold mb-2 ps-1 text-uppercase" style="font-size: 11px;"><i class="bi bi-telephone-fill me-2 text-danger fs-6"></i>Kontak & Darurat</h6>
+    <div class="card border-0 shadow-sm rounded-4 mb-4 overflow-hidden">
+      <div class="list-group list-group-flush" style="font-size: 12px;">
+        <div class="list-group-item d-flex justify-content-between p-3"><span class="text-muted">No. HP Aktif</span><strong id="profHp" class="text-end">-</strong></div>
+        <div class="list-group-item d-flex justify-content-between p-3 bg-light"><span class="text-muted">Email Pribadi</span><strong id="profEmail" class="text-end text-break">-</strong></div>
+        <div class="list-group-item p-3 border-top"><span class="text-danger fw-bold d-block mb-1"><i class="bi bi-heart-pulse-fill me-1"></i> Kontak Darurat</span><strong id="profKontakDarurat" class="text-dark">-</strong></div>
+      </div>
+    </div>
+
+    <h6 class="text-muted small fw-bold mb-2 ps-1 text-uppercase" style="font-size: 11px;"><i class="bi bi-wallet-fill me-2 text-success fs-6"></i>Finansial & Dokumen</h6>
+    <div class="card border-0 shadow-sm rounded-4 mb-4 overflow-hidden">
+      <div class="list-group list-group-flush" style="font-size: 12px;">
+        <div class="list-group-item p-3"><span class="text-muted d-block mb-1">Rekening Bank</span><strong id="profRekening" class="fs-6">-</strong></div>
+        <div class="list-group-item p-3 bg-light"><span class="text-muted d-block mb-1">Data BPJS</span><strong id="profBpjs" class="d-block mb-1">-</strong><strong id="profNpwp" class="text-muted" style="font-size: 10px;">NPWP: -</strong></div>
+        <div class="list-group-item p-3"><span class="text-muted d-block mb-2 fw-bold">Berkas Karyawan</span>
+          <div class="d-flex gap-2">
+            <a href="#" id="btnCv" target="_blank" class="btn btn-sm btn-outline-primary flex-fill disabled" style="font-size: 11px;"><i class="bi bi-file-earmark-person me-1"></i> CV</a>
+            <a href="#" id="btnKtp" target="_blank" class="btn btn-sm btn-outline-secondary flex-fill disabled" style="font-size: 11px;"><i class="bi bi-credit-card-2-front me-1"></i> KTP</a>
+            <a href="#" id="btnKk" target="_blank" class="btn btn-sm btn-outline-secondary flex-fill disabled" style="font-size: 11px;"><i class="bi bi-file-earmark-text me-1"></i> KK</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div style="height: 20px;"></div> 
+  </div>
+
+  <div id="subMenuPengajuan" style="display: none; padding: 15px;">
+      <div class="d-flex align-items-center mb-4 mt-2">
+        <button class="btn btn-light me-3" onclick="kembaliKeDashboard()"><i class="bi bi-arrow-left"></i></button>
+        <h5 class="mb-0 text-dark fw-bold" style="font-size: 16px;">Pengajuan HR</h5>
+      </div>
+      <div class="card border-0 shadow-sm rounded-4 p-3 mb-4">
+        <form id="formPengajuan">
+          <div class="mb-3">
+            <label class="form-label text-muted small">Jenis Pengajuan</label>
+            <select class="form-select" id="jenisPengajuan" onchange="sesuaikanFormPengajuan()">
+              <option value="" selected disabled>-- Pilih Jenis --</option>
+              <option value="Sakit">Sakit</option>
+              <option value="Cuti">Cuti Tahunan</option>
+              <option value="Izin">Izin Tidak Masuk</option>
+              <option value="Izin 1/2 Hari">Izin Setengah Hari</option>
+              <option value="Dinas Luar">Dinas Luar</option>
+              <option value="Lembur">Lembur</option>
+            </select>
+          </div>
+          <div class="mb-3" id="fieldSesi" style="display: none;">
+            <label class="form-label text-muted small">Pilih Sesi</label>
+            <select class="form-select" id="inputSesi">
+              <option value="Sesi 1 (Pagi)">Sesi 1 (Pagi)</option>
+              <option value="Sesi 2 (Siang)">Sesi 2 (Siang)</option>
+            </select>
+          </div>
+          <div class="mb-3" id="fieldJamLembur" style="display: none;">
+            <label class="form-label text-muted small">Rencana Lembur (Jam)</label>
+            <input type="number" class="form-control" id="inputJamLembur" placeholder="Contoh: 2">
+          </div>
+          <div class="row">
+            <div class="col-6 mb-3">
+              <label class="form-label text-muted small">Tanggal Mulai</label>
+              <input type="date" class="form-control" id="tglMulai">
+            </div>
+            <div class="col-6 mb-3" id="fieldTglSelesai">
+              <label class="form-label text-muted small">Tanggal Selesai</label>
+              <input type="date" class="form-control" id="tglSelesai">
+            </div>
+          </div>
+          <div class="mb-3">
+            <label class="form-label text-muted small">Alasan / Keterangan</label>
+            <textarea class="form-control" id="alasanPengajuan" rows="2" placeholder="Tulis alasan lengkap..."></textarea>
+          </div>
+          <div class="mb-4" id="fieldLampiran" style="display: none;">
+            <label class="form-label text-muted small" id="labelLampiran">Lampiran (Surat Dokter / Bukti)</label>
+            <input class="form-control" type="file" id="inputLampiran" accept="image/*">
+            <small class="text-danger" style="font-size: 10px;">*Wajib melampirkan foto</small>
+          </div>
+          <button type="button" class="btn btn-primary w-100 py-2 rounded-pill" id="btnKirimPengajuan" onclick="kirimPengajuan()"><i class="bi bi-send-fill me-2"></i>Kirim Pengajuan</button>
+        </form>
+      </div>
+  </div>
+
+  <div id="layarScanner" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: black; z-index: 9999;">
+    <div class="p-3 d-flex justify-content-between align-items-center" style="position: absolute; top: 0; width: 100%; z-index: 10; background: rgba(0,0,0,0.5);">
+      <i class="bi bi-x-lg fs-3 text-white" onclick="stopScanner()" style="cursor: pointer;"></i>
+      <h6 class="text-white mb-0">Arahkan ke QR Kios</h6>
+      <div style="width: 30px;"></div>
+    </div>
+    <div id="reader" style="width: 100%; height: 100%;"></div>
+    <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 250px; height: 250px; border: 2px solid #ea384d; border-radius: 20px; pointer-events: none;">
+      <div style="width: 100%; height: 2px; background: #ea384d; position: absolute; animation: scanAnim 2s infinite;"></div>
+    </div>
+  </div>
+
+  <div id="layarSelfie" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: black; z-index: 9999;">
+    <div class="p-3 text-center" style="position: absolute; top: 0; width: 100%; z-index: 10; background: rgba(0,0,0,0.5);">
+      <h6 class="text-white mb-0">Foto Selfie Dinas Luar</h6>
+    </div>
+    <video id="videoSelfie" style="width: 100%; height: 100%; object-fit: cover;" autoplay playsinline></video>
+    <canvas id="canvasSelfie" style="display: none;"></canvas>
+    <div style="position: absolute; bottom: 50px; width: 100%; text-align: center;">
+      <button class="btn btn-danger btn-lg rounded-circle" onclick="ambilFoto()" style="width: 70px; height: 70px; border: 5px solid white;"><i class="bi bi-camera-fill"></i></button>
+      <p class="text-white mt-3" style="cursor:pointer;" onclick="tutupSelfie()">Batal</p>
+    </div>
+  </div>
+
+  <div id="dashboardAdmin" style="display: none; min-height: 100vh; background-color: #f8fafc; font-family: 'Segoe UI', sans-serif;">
+    <div class="d-flex">
+      <div class="sidebar-panel" id="adminSidebar">
+        <div class="sidebar-brand p-3 border-bottom border-secondary border-opacity-20 d-flex align-items-center gap-2">
+          <div class="logo-icon-small">A</div>
+          <span class="fw-bold brand-text text-white" style="font-size: 15px;">Akarsa <span style="color: #3b82f6;">HRIS</span></span>
+        </div>
+        <div class="sidebar-menu p-2 overflow-auto" style="height: calc(100vh - 70px);">
+          <div class="menu-group-label">DASHBOARD UTAMA</div>
+          <div class="sidebar-link active" id="lnk-dash" onclick="saklarMenuAdmin('dash', 'Dashboard Overview')">
+            <i class="bi bi-speedometer2"></i> <span class="link-text">Overview</span>
+          </div>
+          
+          <div class="menu-group-label">MODUL ABSENSI</div>
+          <div class="sidebar-link" id="lnk-log" onclick="saklarMenuAdmin('log', 'Live Log Kehadiran')">
+            <i class="bi bi-activity"></i> <span class="link-text">Live Log Kehadiran</span>
+          </div>
+          <div class="sidebar-link" id="lnk-kios" onclick="bukaAdminMenu('kiosQR')">
+            <i class="bi bi-qr-code-scan"></i> <span class="link-text">Mesin Kios Lobi</span>
+          </div>
+          <div class="sidebar-link" id="lnk-rekap-absen" onclick="saklarMenuAdmin('rekap-absen', 'Rekap Laporan Bulanan')">
+            <i class="bi bi-file-earmark-spreadsheet"></i> <span class="link-text">Rekap Laporan Bulanan</span>
+          </div>
+          
+          <div class="menu-group-label">MODUL KARYAWAN (HRIS)</div>
+          <div class="sidebar-link" id="lnk-user" onclick="saklarMenuAdmin('user', 'Master Data Pegawai')">
+            <i class="bi bi-people-fill"></i> <span class="link-text">Master Data Pegawai</span>
+          </div>
+          <div class="sidebar-link" id="lnk-dokumen" onclick="saklarMenuAdmin('dokumen', 'Dokumen & Berkas')">
+            <i class="bi bi-folder2-open"></i> <span class="link-text">Dokumen & Berkas</span>
+          </div>
+          <div class="sidebar-link" id="lnk-pengumuman" onclick="saklarMenuAdmin('pengumuman', 'Broadcast Pengumuman')">
+            <i class="bi bi-megaphone-fill"></i> <span class="link-text">Broadcast Info</span>
+          </div>
+          
+          <div class="menu-group-label">MODUL PENGAJUAN</div>
+          <div class="sidebar-link" id="lnk-appv-cuti" onclick="saklarMenuAdmin('appv-cuti', 'Approval Cuti & Izin')">
+            <i class="bi bi-calendar-check-fill"></i> <span class="link-text">Approval Cuti & Izin</span>
+          </div>
+          <div class="sidebar-link" id="lnk-appv-lembur" onclick="saklarMenuAdmin('appv-lembur', 'Approval Lembur')">
+            <i class="bi bi-clock-fill"></i> <span class="link-text">Approval Lembur</span>
+          </div>
+          
+          <div class="menu-group-label">MODUL KARIR & KINERJA</div>
+          <div class="sidebar-link" id="lnk-kpi" onclick="saklarMenuAdmin('kpi', 'Penilaian Kinerja (KPI)')">
+            <i class="bi bi-bar-chart-line-fill"></i> <span class="link-text">Penilaian Kinerja (KPI)</span>
+          </div>
+          <div class="sidebar-link" id="lnk-grade" onclick="saklarMenuAdmin('grade', 'Kenaikan Grade & Mutasi')">
+            <i class="bi bi-graph-up-arrow"></i> <span class="link-text">Kenaikan Grade</span>
+          </div>
+          <div class="sidebar-link" id="lnk-sp" onclick="saklarMenuAdmin('sp', 'Surat Peringatan (SP)')">
+            <i class="bi bi-exclamation-triangle-fill"></i> <span class="link-text">Surat Peringatan (SP)</span>
+          </div>
+          
+          <div class="menu-group-label">PENGATURAN</div>
+          <div class="sidebar-link" id="lnk-set" onclick="saklarMenuAdmin('set', 'Pengaturan Geofencing GPS')">
+            <i class="bi bi-geo-alt-fill"></i> <span class="link-text">Geofencing GPS</span>
+          </div>
+          <div class="sidebar-link" id="lnk-kalender" onclick="saklarMenuAdmin('kalender', 'Kalender Operasional Khusus')">
+            <i class="bi bi-calendar-event-fill"></i> <span class="link-text">Kalender Operasional</span>
+          </div>
+          <div class="sidebar-link" id="lnk-shift" onclick="saklarMenuAdmin('shift', 'Papan Catur Jadwal Shift')">
+            <i class="bi bi-calendar3-range-fill"></i> <span class="link-text">Manajemen Shift</span>
+          </div>
+          <div class="sidebar-link" id="lnk-hak_akses" onclick="saklarMenuAdmin('hak_akses', 'Hak Akses Admin')">
+            <i class="bi bi-shield-lock-fill"></i> <span class="link-text">Hak Akses Admin</span>
+          </div>
+          
+          <div class="sidebar-link text-danger mt-4 mb-5" onclick="logout()" style="cursor: pointer;">
+            <i class="bi bi-box-arrow-right"></i> <span class="link-text">Keluar Sistem</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="content-panel flex-grow-1" id="adminContent">
+        <div class="admin-navbar px-4 py-2 d-flex justify-content-between align-items-center sticky-top bg-white border-bottom">
+          <div class="d-flex align-items-center gap-3">
+            <i class="bi bi-list fs-4 text-dark toggle-sidebar-btn" onclick="toggleSidebar()" style="cursor: pointer;" title="Lipat/Buka Menu"></i>
+            <h6 class="fw-bold mb-0 text-dark" id="judulHalamanAdmin" style="font-size: 14px; letter-spacing: 0.3px;">Dashboard Overview</h6>
+          </div>
+          <div class="admin-profile">
+            <img src="https://ui-avatars.com/api/?name=Admin+Sistem&background=3b82f6&color=fff" alt="Admin" class="profile-pic" style="width:32px; height:32px;">
+            <div class="profile-info d-none d-md-block">
+              <div class="fw-bold text-dark" style="font-size: 12.5px;" id="adminWelcome">Admin Sistem</div>
+              <div class="text-muted" style="font-size: 11px;" id="adminRoleDesc">Developer</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="container-fluid p-3">
+          
+          <div id="sub-dash" class="sub-halaman-hris">
+            <div class="admin-banner p-3 mb-3">
+              <div>
+                <h5 class="fw-bold text-white mb-1" style="font-size: 16px;">Pusat Kendali Operasional HRIS PT Akarsa Garment 🚀</h5>
+                <p class="text-white opacity-75 mb-0" style="font-size: 12px;">Sistem pemantauan data presensi ganda real-time & manajemen kepegawaian otomatis.</p>
+              </div>
+              <div class="banner-date d-none d-md-block text-white text-end">
+                <div class="fw-bold" style="font-size: 14px;" id="liveTime">00:00</div>
+                <div style="font-size: 11px; opacity: 0.8;">WIB</div>
+              </div>
+            </div>
+            <div class="row g-2">
+              <div class="col-6 col-md-3"><div class="stat-card p-3"><div class="stat-icon bg-success-subtle text-success"><i class="bi bi-person-check-fill"></i></div><div class="stat-value" style="font-size: 20px;">--</div><div class="stat-label">Hadir Hari Ini</div></div></div>
+              <div class="col-6 col-md-3"><div class="stat-card p-3"><div class="stat-icon bg-warning-subtle text-warning"><i class="bi bi-clock-history"></i></div><div class="stat-value" style="font-size: 20px;">--</div><div class="stat-label">Terlambat</div></div></div>
+              <div class="col-6 col-md-3"><div class="stat-card p-3"><div class="stat-icon bg-primary-subtle text-primary"><i class="bi bi-car-front-fill"></i></div><div class="stat-value" style="font-size: 20px;">--</div><div class="stat-label">Dinas Luar</div></div></div>
+              <div class="col-6 col-md-3"><div class="stat-card p-3"><div class="stat-icon bg-danger-subtle text-danger"><i class="bi bi-person-x-fill"></i></div><div class="stat-value" style="font-size: 20px;">--</div><div class="stat-label">Mangkir</div></div></div>
+            </div>
+          </div>
+
+          <div id="sub-log" class="sub-halaman-hris" style="display: none;">
+            <div class="bg-white rounded-3 p-3 shadow-sm border border-light">
+              <div class="d-flex justify-content-between align-items-center mb-3">
+                <h6 class="fw-bold mb-0 text-dark" style="font-size: 13px;">Log Aktivitas Presensi Terkini (Firebase Real-Time)</h6>
+                <button class="btn btn-xs btn-outline-primary px-2 py-1" style="font-size: 11px; font-weight: 600;" onclick="loadLiveLog()"><i class="bi bi-arrow-clockwise"></i> Segarkan</button>
+              </div>
+              <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                  <thead class="table-light text-muted" style="font-size: 11.5px; font-weight:700;">
+                    <tr><th>WAKTU</th><th>NAMA KARYAWAN</th><th>STATUS</th><th>METODE</th></tr>
+                  </thead>
+                  <tbody id="tabelLiveLog" style="font-size: 12.5px;"></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          <div id="sub-user" class="sub-halaman-hris" style="display: none;">
+            <div class="d-flex justify-content-between align-items-center mb-3 bg-white p-2 rounded-3 shadow-sm border">
+              <div class="input-group shadow-none w-50" style="border: 1px solid #dee2e6; border-radius: 6px; overflow:hidden;">
+                <span class="input-group-text bg-white border-0 py-1"><i class="bi bi-search text-muted" style="font-size:12px;"></i></span>
+                <input type="text" class="form-control border-0 py-1" id="cariUser" placeholder="Cari NIK, nama atau jabatan..." style="font-size: 12.5px;">
+              </div>
+              <button class="btn btn-sm btn-danger fw-bold shadow-sm" onclick="bukaModalUser('baru')" style="font-size: 12px; padding: 6px 12px;"><i class="bi bi-person-plus-fill me-1"></i> Tambah Akun</button>
+            </div>
+            
+            <ul class="nav nav-pills mb-2 border-bottom pb-1" id="userTabs" role="tablist" style="font-size: 12px;">
+              <li class="nav-item"><button class="nav-link active py-1 px-3 fw-bold" id="tab-karyawan" data-bs-toggle="pill" data-bs-target="#konten-karyawan" type="button" role="tab"><i class="bi bi-people-fill me-1"></i>Karyawan</button></li>
+              <li class="nav-item"><button class="nav-link py-1 px-3 fw-bold" id="tab-sistem" data-bs-toggle="pill" data-bs-target="#konten-sistem" type="button" role="tab"><i class="bi bi-shield-lock-fill me-1"></i>Admin Sistem</button></li>
+            </ul>
+
+            <div class="tab-content" id="userTabsContent">
+              <div class="tab-pane fade show active" id="konten-karyawan" role="tabpanel">
+                <div class="bg-white rounded-3 p-2 shadow-sm border border-light table-responsive">
+                  <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light text-muted" style="font-size: 11.5px;">
+                      <tr><th>NIK / NAMA</th><th>JABATAN</th><th>ROLE ABSEN</th><th>STATUS</th><th>AKSI</th></tr>
+                    </thead>
+                    <tbody id="tabelKaryawan" style="font-size: 12.5px;">
+                      <tr><td colspan="5" class="text-center text-muted py-3">Klik tab atau muat ulang untuk sinkronisasi...</td></tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+              <div class="tab-pane fade" id="konten-sistem" role="tabpanel">
+                <div class="bg-white rounded-3 p-2 shadow-sm border border-light table-responsive">
+                  <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light text-muted" style="font-size: 11.5px;">
+                      <tr><th>ID SISTEM / NAMA</th><th>ROLE HAK AKSES</th><th>STATUS</th><th>AKSI</th></tr>
+                    </thead>
+                    <tbody id="tabelAdmin" style="font-size: 12.5px;"></tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div id="sub-set" class="sub-halaman-hris" style="display: none;">
+            <div class="bg-white rounded-3 p-3 shadow-sm border border-light max-width-600">
+              <h6 class="fw-bold text-dark mb-2" style="font-size:13px;"><i class="bi bi-geo-alt-fill text-danger me-2"></i>Parameter Geofencing Pabrik Akarsa</h6>
+              <p class="text-muted" style="font-size: 11.5px; margin-bottom: 15px;">Sesuaikan koordinat lobi pusat pabrik dan radius toleransi jarak aman bagi HP Karyawan.</p>
+              <div class="mb-2"><label class="form-label fw-bold" style="font-size:11.5px; margin-bottom:3px;">Latitude (Garis Lintang)</label><input type="text" id="inputLat" class="form-control form-control-sm" style="font-size:12.5px;"></div>
+              <div class="mb-2"><label class="form-label fw-bold" style="font-size:11.5px; margin-bottom:3px;">Longitude (Garis Lintang)</label><input type="text" id="inputLng" class="form-control form-control-sm" style="font-size:12.5px;"></div>
+              <div class="mb-3"><label class="form-label fw-bold" style="font-size:11.5px; margin-bottom:3px;">Radius Batas Toleransi (Meter)</label><input type="number" id="inputRadius" class="form-control form-control-sm" style="font-size:12.5px;"></div>
+              <button id="btnSimpanPengaturan" class="btn btn-primary w-100 fw-bold btn-sm py-2" onclick="simpanPengaturan()" style="font-size:12px;"><i class="bi bi-save me-2"></i>SIMPAN PARAMETER</button>
+            </div>
+          </div>
+
+          <div id="sub-rekap-absen" class="sub-halaman-hris" style="display: none;">
+            <div class="bg-white rounded-3 p-3 shadow-sm border border-light mb-3">
+              <div class="d-flex justify-content-between align-items-center mb-3">
+                <h6 class="fw-bold mb-0 text-dark" style="font-size: 14px;"><i class="bi bi-file-earmark-spreadsheet-fill text-success me-2"></i>Pusat Laporan Kehadiran</h6>
+              </div>
+              <ul class="nav nav-pills mb-3 border-bottom pb-2" id="rekapTabs" style="font-size: 12px;">
+                <li class="nav-item"><button class="nav-link active fw-bold py-1 px-3" data-bs-toggle="pill" data-bs-target="#tab-harian">Rekap Harian</button></li>
+                <li class="nav-item"><button class="nav-link fw-bold py-1 px-3" data-bs-toggle="pill" data-bs-target="#tab-mingguan">Rekap Mingguan</button></li>
+                <li class="nav-item"><button class="nav-link fw-bold py-1 px-3" data-bs-toggle="pill" data-bs-target="#tab-bulanan">Rekap Bulanan</button></li>
+              </ul>
+              <div class="tab-content">
+                <div class="tab-pane fade show active" id="tab-harian">
+                  <div class="row g-2 mb-3 align-items-end">
+                    <div class="col-md-3"><label class="form-label text-muted fw-bold mb-1" style="font-size: 11px;">Pilih Tanggal</label><input type="date" class="form-control form-control-sm" id="filterTglHarian"></div>
+                    <div class="col-md-5"><label class="form-label text-muted fw-bold mb-1" style="font-size: 11px;">Cari Karyawan</label><input type="text" class="form-control form-control-sm" id="cariHarian" placeholder="Ketik NIK / Nama..."></div>
+                    <div class="col-md-4 d-flex gap-2"><button class="btn btn-sm btn-primary flex-grow-1 fw-bold" style="font-size: 12px;" onclick="loadLaporanHarian()"><i class="bi bi-search"></i> Tampilkan</button><button class="btn btn-sm btn-success fw-bold px-3" onclick="eksporExcel('tabelHarianAsli', 'Laporan_Harian')"><i class="bi bi-file-excel-fill"></i></button></div>
+                  </div>
+                  <div class="table-responsive border rounded"><table class="table table-hover align-middle mb-0" id="tabelHarianAsli"><thead class="table-light text-muted" style="font-size: 11px;"><tr><th>NAMA KARYAWAN</th><th>JAM MASUK</th><th>JAM KELUAR</th><th>STATUS</th><th>KETERANGAN</th></tr></thead><tbody id="tabelHarian" style="font-size:12.5px;"><tr><td colspan="5" class="text-center py-3 text-muted" style="font-size: 12px;">Pilih tanggal untuk melihat log harian.</td></tr></tbody></table></div>
+                </div>
+                <div class="tab-pane fade" id="tab-mingguan">
+                  <div class="row g-2 mb-3 align-items-end">
+                    <div class="col-md-3"><label class="form-label text-muted fw-bold mb-1" style="font-size: 11px;">Pilih Minggu Ke-</label><input type="week" class="form-control form-control-sm" id="filterMinggu"></div>
+                    <div class="col-md-5"><label class="form-label text-muted fw-bold mb-1" style="font-size: 11px;">Cari Karyawan</label><input type="text" class="form-control form-control-sm" id="cariMingguan" placeholder="Ketik NIK / Nama..."></div>
+                    <div class="col-md-4 d-flex gap-2"><button class="btn btn-sm btn-primary flex-grow-1 fw-bold" style="font-size: 12px;" onclick="loadLaporanMingguan()"><i class="bi bi-search"></i> Tampilkan</button><button class="btn btn-sm btn-success fw-bold px-3" onclick="eksporExcel('tabelMingguanAsli', 'Laporan_Mingguan')"><i class="bi bi-file-excel-fill"></i></button></div>
+                  </div>
+                  <div class="table-responsive border rounded"><table class="table table-hover align-middle mb-0" id="tabelMingguanAsli"><thead class="table-light text-muted" style="font-size: 11px;"><tr><th>NAMA KARYAWAN</th><th class="text-center">TOTAL HADIR</th><th class="text-center text-danger">TOTAL TELAT</th><th class="text-center text-primary">DINAS LUAR</th><th class="text-center text-warning">LEMBUR LIBUR</th></tr></thead><tbody id="tabelMingguan" style="font-size:12.5px;"><tr><td colspan="5" class="text-center py-3 text-muted" style="font-size: 12px;">Pilih minggu untuk melihat rekap mingguan.</td></tr></tbody></table></div>
+                </div>
+                <div class="tab-pane fade" id="tab-bulanan">
+                  <div class="row g-2 mb-3 align-items-end">
+                    <div class="col-md-3"><label class="form-label text-muted fw-bold mb-1" style="font-size: 11px;">Pilih Bulan</label><input type="month" class="form-control form-control-sm" id="filterBulanLaporan"></div>
+                    <div class="col-md-5"><label class="form-label text-muted fw-bold mb-1" style="font-size: 11px;">Cari Karyawan</label><input type="text" class="form-control form-control-sm" id="filterNamaLaporan" placeholder="Ketik NIK / Nama..."></div>
+                    <div class="col-md-4 d-flex gap-2"><button class="btn btn-sm btn-primary flex-grow-1 fw-bold" style="font-size: 12px;" onclick="loadLaporanBulanan()"><i class="bi bi-search"></i> Tampilkan</button><button class="btn btn-sm btn-success fw-bold px-3" onclick="eksporExcel('tabelBulananAsli', 'Laporan_Bulanan')"><i class="bi bi-file-excel-fill"></i></button></div>
+                  </div>
+                  <div class="table-responsive border rounded"><table class="table table-hover align-middle mb-0" id="tabelBulananAsli"><thead class="table-light text-muted" style="font-size: 11px;"><tr><th>NAMA KARYAWAN</th><th class="text-center">TOTAL HADIR</th><th class="text-center text-danger">TOTAL TELAT</th><th class="text-center text-primary">DINAS LUAR</th><th class="text-center text-warning">LEMBUR LIBUR</th></tr></thead><tbody id="tabelLaporanBulanan" style="font-size:12.5px;"><tr><td colspan="5" class="text-center py-3 text-muted" style="font-size: 12px;">Pilih bulan untuk melihat rekap *payroll*.</td></tr></tbody></table></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div id="sub-kalender" class="sub-halaman-hris" style="display: none;">
+            <div class="row g-3">
+              <div class="col-md-4">
+                <div class="bg-white rounded-3 p-3 shadow-sm border border-light h-100">
+                  <h6 class="fw-bold text-dark mb-3" style="font-size:13px;"><i class="bi bi-calendar-plus text-primary me-2"></i>Tetapkan Kebijakan Hari</h6>
+                  <div class="mb-2"><label class="form-label fw-bold" style="font-size:11.5px; margin-bottom:3px;">Pilih Tanggal</label><input type="date" class="form-control form-control-sm"></div>
+                  <div class="mb-2">
+                    <label class="form-label fw-bold" style="font-size:11.5px; margin-bottom:3px;">Status Hari Ini</label>
+                    <select class="form-select form-select-sm">
+                      <option value="Kerja Reguler">Kerja Reguler (Abaikan Tgl Merah)</option>
+                      <option value="Libur Ekstra">Libur Ekstra / Pengganti</option>
+                    </select>
+                  </div>
+                  <div class="mb-3"><label class="form-label fw-bold" style="font-size:11.5px; margin-bottom:3px;">Keterangan / Alasan</label><textarea class="form-control form-control-sm" rows="2" placeholder="Contoh: Tukar libur Idul Adha"></textarea></div>
+                  <button class="btn btn-primary w-100 fw-bold btn-sm py-2" style="font-size:12px;" onclick="simpanKalender()"><i class="bi bi-save me-2"></i>SIMPAN KEBIJAKAN</button>
+                </div>
+              </div>
+              <div class="col-md-8">
+                <div class="bg-white rounded-3 p-3 shadow-sm border border-light h-100">
+                  <h6 class="fw-bold text-dark mb-3" style="font-size:13px;"><i class="bi bi-card-checklist text-success me-2"></i>Daftar Kebijakan Aktif</h6>
+                  <div class="table-responsive border rounded">
+                    <table class="table table-hover align-middle mb-0"><thead class="table-light text-muted" style="font-size: 11px;"><tr><th>TANGGAL</th><th>STATUS HARI</th><th>KETERANGAN</th><th>AKSI</th></tr></thead><tbody style="font-size: 12px;"><tr><td colspan="4" class="text-center py-3 text-muted">Belum ada kebijakan khusus yang ditambahkan.</td></tr></tbody></table>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div id="sub-shift" class="sub-halaman-hris" style="display: none;">
+            <div class="bg-white rounded-3 p-3 shadow-sm border border-light mb-3">
+              <h6 class="fw-bold text-dark mb-3 border-bottom pb-2" style="font-size:14px;"><i class="bi bi-grid-3x3-gap-fill text-warning me-2"></i>Matriks Papan Catur Shift Bulanan</h6>
+              <div class="row g-2 mb-3 bg-light p-2 rounded border">
+                <div class="col-md-3" style="position: relative;">
+                  <label class="form-label text-muted fw-bold mb-1" style="font-size: 11px;">Cari & Pilih Karyawan</label>
+                  <input type="text" class="form-control form-control-sm" id="inputCariKaryawan" placeholder="Memuat database..." autocomplete="off">
+                  <div id="listKaryawanShift" class="list-group position-absolute w-100 shadow" style="display: none; z-index: 1000; max-height: 200px; overflow-y: auto;"></div>
+                </div>
+                <div class="col-md-2"><label class="form-label text-muted fw-bold mb-1" style="font-size: 11px;">Rentang (Mulai)</label><input type="date" class="form-control form-control-sm" id="tglMulaiShift"></div>
+                <div class="col-md-2"><label class="form-label text-muted fw-bold mb-1" style="font-size: 11px;">Rentang (Sampai)</label><input type="date" class="form-control form-control-sm" id="tglSelesaiShift"></div>
+                <div class="col-md-3"><label class="form-label text-muted fw-bold mb-1" style="font-size: 11px;">Pilih Kode Shift</label>
+                  <select class="form-select form-select-sm" id="pilihKodeShift">
+                    <option value="P">P - Pagi (07:00 - 19:00)</option>
+                    <option value="M">M - Malam (19:00 - 07:00)</option>
+                    <option value="L">L - Libur Ganti Hari</option>
+                    <option value="">KOSONG - (Kembali ke Reguler)</option>
+                  </select>
+                </div>
+                <div class="col-md-2 d-flex align-items-end"><button class="btn btn-sm btn-primary w-100 fw-bold" id="btnTerapkanShift" style="font-size: 12px;" onclick="terapkanShift()"><i class="bi bi-check-circle"></i> Terapkan</button></div>
+              </div>
+              <div class="alert alert-info py-2 px-3" style="font-size: 11px;"><i class="bi bi-info-circle-fill me-1"></i> <b>Sistem Jaring Pengaman:</b> Jika kotak di papan catur kosong, sistem otomatis memberlakukan aturan absensi kantor reguler (07:30) pada hari tersebut.</div>
+              
+              <div class="table-responsive border rounded" style="max-height: 400px; overflow: auto;">
+                <table class="table table-bordered table-sm align-middle text-center mb-0" style="font-size: 11px;">
+                  <thead class="table-dark sticky-top">
+                    <tr><th style="min-width: 150px; text-align: left; position: sticky; left: 0; z-index: 2;" class="ps-2">NAMA KARYAWAN</th><th>1</th><th>2</th><th>3</th><th>4</th><th>5</th><th>6</th><th>7</th><th>8</th><th>9</th><th>10</th><th>11</th><th>12</th><th>13</th><th>14</th><th>15</th><th>16</th><th>17</th><th>18</th><th>19</th><th>20</th><th>21</th><th>22</th><th>23</th><th>24</th><th>25</th><th>26</th><th>27</th><th>28</th><th>29</th><th>30</th><th>31</th></tr>
+                  </thead>
+                  <tbody id="tabelPapanCatur"></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+          
+          <div id="sub-dokumen" class="sub-halaman-hris" style="display: none;">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+              <h5 class="fw-bold m-0"><i class="bi bi-folder2-open me-2 text-primary"></i>Pusat Arsip Internal</h5>
+              <button class="btn btn-sm btn-primary fw-bold px-3 shadow-sm" onclick="bukaModalArsip()"><i class="bi bi-cloud-arrow-up me-2"></i>Upload Berkas Internal</button>
+            </div>
+            <div class="row g-2 mb-3">
+              <div class="col-md-3">
+                <select class="form-select form-select-sm fw-bold text-primary border-primary" id="filterKategoriArsip" onchange="loadTabelArsip()">
+                  <option value="SEMUA">Semua Kategori</option>
+                  <option value="Surat Peringatan (SP)">Surat Peringatan (SP)</option>
+                  <option value="Surat Keputusan (SK)">Surat Keputusan (SK)</option>
+                  <option value="Kontrak Kerja">Kontrak Kerja</option>
+                  <option value="SOP / Peraturan">SOP / Peraturan Perusahaan</option>
+                  <option value="Lainnya">Lainnya</option>
+                </select>
+              </div>
+              <div class="col-md-9">
+                <input type="text" class="form-control form-control-sm" id="cariArsip" placeholder="🔍 Cari nama karyawan atau judul dokumen..." onkeyup="filterTabelArsip()">
+              </div>
+            </div>
+            <div class="table-responsive bg-white rounded shadow-sm border">
+              <table class="table table-hover align-middle mb-0" style="font-size: 12px;">
+                <thead class="table-light text-muted">
+                  <tr>
+                    <th>TANGGAL</th>
+                    <th>NAMA KARYAWAN / TARGET</th>
+                    <th>KATEGORI</th>
+                    <th>JUDUL DOKUMEN</th>
+                    <th class="text-center">AKSI</th>
+                  </tr>
+                </thead>
+                <tbody id="tabelArsip">
+                  <tr><td colspan="5" class="text-center text-muted py-4">Memuat data arsip...</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div id="sub-sp" class="sub-halaman-hris" style="display: none;">
+            <div class="row g-3">
+              <div class="col-md-5">
+                <div class="bg-white rounded-3 p-4 shadow-sm border border-light h-100">
+                  <h6 class="fw-bold text-dark mb-4" style="font-size:14px;"><i class="bi bi-exclamation-triangle-fill text-danger me-2"></i>Terbitkan Surat Peringatan (SP)</h6>
+                  
+                  <div class="mb-3" style="position: relative;">
+                    <label class="form-label text-muted fw-bold mb-1" style="font-size: 11px;">Cari & Pilih Karyawan</label>
+                    <input type="text" class="form-control form-control-sm border-danger" id="inputCariKaryawanSP" placeholder="🔍 Ketik NIK atau Nama..." autocomplete="off">
+                    <div id="listKaryawanSP" class="list-group position-absolute w-100 shadow" style="display: none; z-index: 1000; max-height: 200px; overflow-y: auto;"></div>
+                  </div>
+                  
+                  <div class="mb-3">
+                    <label class="form-label text-muted fw-bold mb-1" style="font-size: 11px;">Tingkat Peringatan</label>
+                    <select class="form-select form-select-sm border-danger" id="tingkatSP">
+                      <option value="SP 1">Surat Peringatan 1 (SP 1)</option>
+                      <option value="SP 2">Surat Peringatan 2 (SP 2)</option>
+                      <option value="SP 3">Surat Peringatan Terakhir (SP 3)</option>
+                    </select>
+                  </div>
+                  
+                  <div class="mb-4">
+                    <label class="form-label text-muted fw-bold mb-1" style="font-size: 11px;">Alasan Pelanggaran</label>
+                    <textarea class="form-control form-control-sm" id="alasanSP" rows="3" placeholder="Contoh: Terlambat absen lebih dari 4 kali dalam satu bulan..."></textarea>
+                  </div>
+                  
+                  <div class="alert alert-danger py-2 px-3 mb-4" style="font-size: 11px;">
+                    <i class="bi bi-info-circle-fill me-1"></i> <b>Auto-Expired:</b> Masa aktif SP diatur otomatis oleh sistem selama <b>3 Bulan</b> sejak hari ini.
+                  </div>
+                  
+                  <button class="btn btn-danger w-100 fw-bold btn-sm py-2" id="btnTerbitkanSP" onclick="terbitkanSP()"><i class="bi bi-send-fill me-2"></i>TERBITKAN SP SEKARANG</button>
+                </div>
+              </div>
+              
+              <div class="col-md-7">
+                <div class="bg-white rounded-3 p-3 shadow-sm border border-light h-100">
+                  <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h6 class="fw-bold text-dark m-0" style="font-size:13px;"><i class="bi bi-clock-history text-primary me-2"></i>Riwayat Penerbitan SP</h6>
+                    <button class="btn btn-xs btn-outline-primary" onclick="loadRiwayatSP()"><i class="bi bi-arrow-clockwise"></i></button>
+                  </div>
+                  <div class="table-responsive border rounded" style="max-height: 420px; overflow: auto;">
+                    <table class="table table-hover align-middle mb-0" style="font-size: 11px;">
+                      <thead class="table-light text-muted sticky-top">
+                        <tr><th>TANGGAL</th><th>NAMA KARYAWAN</th><th>TINGKAT</th><th class="text-danger">KEDALUWARSA</th></tr>
+                      </thead>
+                      <tbody id="tabelRiwayatSP">
+                        <tr><td colspan="4" class="text-center py-3 text-muted">Belum ada data ditarik.</td></tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div id="sub-grade" class="sub-halaman-hris" style="display: none;">
+            <div class="row g-3">
+              <div class="col-md-5">
+                <div class="bg-white rounded-3 p-4 shadow-sm border border-light h-100">
+                  <h6 class="fw-bold text-dark mb-4" style="font-size:14px;"><i class="bi bi-graph-up-arrow text-success me-2"></i>Form Kenaikan Grade & Mutasi</h6>
+                  
+                  <div class="mb-3" style="position: relative;">
+                    <label class="form-label text-muted fw-bold mb-1" style="font-size: 11px;">Pilih Karyawan</label>
+                    <input type="text" class="form-control form-control-sm border-primary fw-bold" id="inputCariMutasi" placeholder="🔍 Ketik NIK atau Nama..." autocomplete="off">
+                    <div id="listKaryawanMutasi" class="list-group position-absolute w-100 shadow" style="display: none; z-index: 1000; max-height: 200px; overflow-y: auto;"></div>
+                  </div>
+
+                  <div class="row g-2 mb-3">
+                    <div class="col-6">
+                      <label class="form-label text-muted fw-bold mb-1" style="font-size: 11px;">Departemen Saat Ini</label>
+                      <input type="text" class="form-control form-control-sm bg-light text-muted" id="mutDeptLama" readonly>
+                    </div>
+                    <div class="col-6">
+                      <label class="form-label text-primary fw-bold mb-1" style="font-size: 11px;">Departemen Baru</label>
+                      <input type="text" class="form-control form-control-sm border-primary" id="mutDeptBaru">
+                    </div>
+                    
+                    <div class="col-6">
+                      <label class="form-label text-muted fw-bold mb-1" style="font-size: 11px;">Jabatan Saat Ini</label>
+                      <input type="text" class="form-control form-control-sm bg-light text-muted" id="mutJabatanLama" readonly>
+                    </div>
+                    <div class="col-6">
+                      <label class="form-label text-primary fw-bold mb-1" style="font-size: 11px;">Jabatan Baru</label>
+                      <input type="text" class="form-control form-control-sm border-primary" id="mutJabatanBaru">
+                    </div>
+
+                    <div class="col-6">
+                      <label class="form-label text-muted fw-bold mb-1" style="font-size: 11px;">Grade Saat Ini</label>
+                      <input type="text" class="form-control form-control-sm bg-light text-muted" id="mutGradeLama" readonly>
+                    </div>
+                    <div class="col-6">
+                      <label class="form-label text-success fw-bold mb-1" style="font-size: 11px;">Grade Baru</label>
+                      <input type="text" class="form-control form-control-sm border-success fw-bold" id="mutGradeBaru">
+                    </div>
+                  </div>
+
+                  <div class="mb-3">
+                    <label class="form-label text-muted fw-bold mb-1" style="font-size: 11px;">Tanggal Efektif Berlaku</label>
+                    <input type="date" class="form-control form-control-sm" id="mutTglEfektif">
+                  </div>
+
+                  <div class="mb-4">
+                    <label class="form-label text-muted fw-bold mb-1" style="font-size: 11px;">Alasan / Keterangan Kenaikan</label>
+                    <textarea class="form-control form-control-sm" id="mutAlasan" rows="2" placeholder="Contoh: Promosi Tahunan 2026, Penyesuaian Departemen..."></textarea>
+                  </div>
+                  
+                  <button class="btn btn-success w-100 fw-bold btn-sm py-2 shadow-sm" id="btnSimpanMutasi" onclick="simpanMutasi()"><i class="bi bi-check-circle-fill me-2"></i>PROSES MUTASI SEKARANG</button>
+                </div>
+              </div>
+              
+              <div class="col-md-7">
+                <div class="bg-white rounded-3 p-3 shadow-sm border border-light h-100">
+                  <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h6 class="fw-bold text-dark m-0" style="font-size:13px;"><i class="bi bi-clock-history text-primary me-2"></i>Riwayat Kenaikan Grade & Mutasi</h6>
+                    <button class="btn btn-xs btn-outline-primary" onclick="loadRiwayatMutasi()"><i class="bi bi-arrow-clockwise"></i></button>
+                  </div>
+                  <div class="table-responsive border rounded" style="max-height: 500px; overflow: auto;">
+                    <table class="table table-hover align-middle mb-0" style="font-size: 11px;">
+                      <thead class="table-light text-muted sticky-top">
+                        <tr><th>TGL EFEKTIF</th><th>NAMA KARYAWAN</th><th>JABATAN BARU</th><th>KETERANGAN</th></tr>
+                      </thead>
+                      <tbody id="tabelRiwayatMutasi">
+                        <tr><td colspan="4" class="text-center py-3 text-muted">Belum ada riwayat.</td></tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div id="sub-hak_akses" class="sub-halaman-hris" style="display: none;">
+            <div class="row g-3">
+              <div class="col-md-4">
+                <div class="bg-white rounded-3 p-4 shadow-sm border border-light h-100">
+                  <h6 class="fw-bold text-dark mb-4" style="font-size:14px;"><i class="bi bi-shield-lock-fill text-danger me-2"></i>Kelola Akun Admin</h6>
+                  
+                  <div class="mb-3">
+                    <label class="form-label text-muted fw-bold mb-1" style="font-size: 11px;">Username / NIK</label>
+                    <input type="text" class="form-control form-control-sm border-danger" id="admUser" placeholder="Ketik Username/NIK unik...">
+                  </div>
+                  <div class="mb-3">
+                    <label class="form-label text-muted fw-bold mb-1" style="font-size: 11px;">Nama Lengkap</label>
+                    <input type="text" class="form-control form-control-sm" id="admNama" placeholder="Nama Admin...">
+                  </div>
+                  <div class="mb-3">
+                    <label class="form-label text-muted fw-bold mb-1" style="font-size: 11px;">Role / Tingkat Akses</label>
+                    <select class="form-select form-select-sm" id="admRole">
+                      <option value="Developer">Developer</option>
+                      <option value="HR Manager">HR Manager</option>
+                      <option value="HR">HR</option>
+                      <option value="Staff">Staff</option>
+                    </select>
+                  </div>
+                  <div class="mb-3">
+                    <label class="form-label text-muted fw-bold mb-1" style="font-size: 11px;">Status Akun</label>
+                    <select class="form-select form-select-sm" id="admStatus">
+                      <option value="Aktif">Aktif</option>
+                      <option value="Nonaktif">Nonaktif (Blokir)</option>
+                    </select>
+                  </div>
+                  <div class="mb-4">
+                    <label class="form-label text-muted fw-bold mb-1" style="font-size: 11px;">Ganti PIN (Kosongkan jika tidak diubah)</label>
+                    <input type="password" class="form-control form-control-sm" id="admPin" placeholder="Ketik PIN baru...">
+                  </div>
+                  
+                  <button class="btn btn-danger w-100 fw-bold btn-sm py-2 shadow-sm" id="btnSimpanAdmin" onclick="simpanAdmin()"><i class="bi bi-save-fill me-2"></i>SIMPAN DATA ADMIN</button>
+                </div>
+              </div>
+              
+              <div class="col-md-8">
+                <div class="bg-white rounded-3 p-3 shadow-sm border border-light h-100">
+                  <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h6 class="fw-bold text-dark m-0" style="font-size:13px;"><i class="bi bi-people-fill text-primary me-2"></i>Daftar Pengguna Sistem</h6>
+                    <button class="btn btn-xs btn-outline-primary" onclick="loadAdmins()"><i class="bi bi-arrow-clockwise"></i></button>
+                  </div>
+                  <div class="table-responsive border rounded" style="max-height: 500px; overflow: auto;">
+                    <table class="table table-hover align-middle mb-0" style="font-size: 11px;">
+                      <thead class="table-light text-muted sticky-top">
+                        <tr><th>USERNAME</th><th>NAMA LENGKAP</th><th>ROLE (AKSES)</th><th>STATUS</th><th>AKSI</th></tr>
+                      </thead>
+                      <tbody id="tabelAdmins">
+                        <tr><td colspan="5" class="text-center py-3 text-muted">Memuat data...</td></tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div id="sub-pengumuman" class="sub-halaman-hris" style="display:none;">
+  <div class="card border-0 shadow-sm rounded-4">
+    <div class="card-body p-4">
+      <h5 class="fw-bold mb-4" style="color: #1d4ed8;"><i class="bi bi-send-fill me-2"></i>Kirim Pengumuman / Notifikasi</h5>
+      <div class="row g-3">
+        
+        <div class="col-md-4">
+          <label class="form-label fw-bold" style="font-size: 12px;">Target Penerima</label>
+          <select class="form-select border-primary" id="notifTarget" onchange="toggleNotifTarget()">
+            <option value="SEMUA">📢 Semua Karyawan</option>
+            <option value="PILIH">🎯 Karyawan Tertentu (Pilih Manual)</option>
+          </select>
+        </div>
+
+        <div class="col-md-4" id="bungkusCariNik" style="display: none;">
+          <label class="form-label text-danger fw-bold mb-1" style="font-size: 12px;">Ketik NIK atau Nama</label>
+          <div style="position: relative;">
+            <input type="text" class="form-control border-danger fw-bold" id="inputNikBroadcast" placeholder="🔍 Cari NIK / Nama..." autocomplete="off">
+            <div id="listKaryawanBroadcast" class="list-group position-absolute w-100 shadow" style="display: none; z-index: 1000; max-height: 200px; overflow-y: auto;"></div>
+          </div>
+        </div>
+
+        <div class="col-md-4">
+          <label class="form-label fw-bold" style="font-size: 12px;">Tipe Pesan</label>
+          <select class="form-select" id="notifTipe">
+            <option value="info">Biru (Informasi Umum)</option>
+            <option value="warning">Kuning (Peringatan / SP)</option>
+            <option value="danger">Merah (Urgent / Penting)</option>
+            <option value="success">Hijau (Kabar Baik / Reward)</option>
+          </select>
+        </div>
+
+        <div class="col-md-12 mt-3">
+          <label class="form-label fw-bold" style="font-size: 12px;">Judul Pengumuman</label>
+          <input type="text" class="form-control fw-bold" id="notifJudul" placeholder="Cth: Perubahan Jadwal Shift Minggu Depan">
+        </div>
+        <div class="col-12 mt-3">
+          <label class="form-label fw-bold" style="font-size: 12px;">Isi Pesan / Instruksi Lengkap</label>
+          <textarea class="form-control" id="notifPesan" rows="4" placeholder="Tuliskan pengumuman secara detail di sini..."></textarea>
+        </div>
+        <div class="col-12 text-end mt-4">
+          <button class="btn btn-primary fw-bold px-4 rounded-pill shadow-sm" id="btnKirimNotif" onclick="kirimPengumuman()"><i class="bi bi-rocket-takeoff me-2"></i>Kirim Notifikasi Sekarang</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+          <div id="sub-appv-cuti" class="sub-halaman-hris" style="display: none;">
+            <div class="bg-white rounded-3 p-3 shadow-sm border border-light">
+              <h6 class="fw-bold mb-3 text-dark"><i class="bi bi-calendar-check-fill text-primary me-2"></i>Approval Cuti, Izin & Sakit</h6>
+              <div class="mb-3">
+                <input type="text" id="cariCuti" class="form-control form-control-sm border-primary shadow-sm" placeholder="🔍 Ketik Nama atau NIK untuk mencari cepat..." onkeyup="filterTabel('cariCuti', 'tabelAppvCuti', 'tabelRiwayatCuti')">
+              </div>
+              <ul class="nav nav-pills mb-3 border-bottom pb-2" id="pills-tab-cuti" role="tablist" style="font-size:12px;">
+                <li class="nav-item" role="presentation">
+                  <button class="nav-link active py-1 px-3 me-2" data-bs-toggle="pill" data-bs-target="#pills-pending-cuti" type="button" role="tab">Menunggu Persetujuan</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                  <button class="nav-link py-1 px-3" data-bs-toggle="pill" data-bs-target="#pills-riwayat-cuti" type="button" role="tab">Riwayat Keputusan</button>
+                </li>
+              </ul>
+
+              <div class="tab-content" id="pills-tabContentCuti">
+                <div class="tab-pane fade show active" id="pills-pending-cuti" role="tabpanel">
+                  <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0" style="font-size: 12px;">
+                      <thead class="table-light text-muted">
+                        <tr><th>NAMA KARYAWAN</th><th>TIPE</th><th>TANGGAL PENGAJUAN</th><th>ALASAN / KET</th><th class="text-center">AKSI</th></tr>
+                      </thead>
+                      <tbody id="tabelAppvCuti"><tr><td colspan="5" class="text-center py-3 text-muted">Memuat data...</td></tr></tbody>
+                    </table>
+                  </div>
+                </div>
+                <div class="tab-pane fade" id="pills-riwayat-cuti" role="tabpanel">
+                  <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0" style="font-size: 12px;">
+                      <thead class="table-light text-muted">
+                        <tr><th>NAMA KARYAWAN</th><th>TIPE</th><th>TANGGAL</th><th>STATUS</th><th>DISETUJUI OLEH</th></tr>
+                      </thead>
+                      <tbody id="tabelRiwayatCuti"><tr><td colspan="5" class="text-center py-3 text-muted">Memuat data...</td></tr></tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div id="sub-appv-lembur" class="sub-halaman-hris" style="display: none;">
+            <div class="bg-white rounded-3 p-3 shadow-sm border border-light">
+              <h6 class="fw-bold mb-3 text-dark"><i class="bi bi-clock-fill text-warning me-2"></i>Approval Lembur</h6>
+              <div class="mb-3">
+                <input type="text" id="cariLembur" class="form-control form-control-sm border-warning shadow-sm" placeholder="🔍 Ketik Nama atau NIK untuk mencari cepat..." onkeyup="filterTabel('cariLembur', 'tabelAppvLembur', 'tabelRiwayatLembur')">
+              </div>
+              <ul class="nav nav-pills mb-3 border-bottom pb-2" id="pills-tab-lembur" role="tablist" style="font-size:12px;">
+                <li class="nav-item" role="presentation">
+                  <button class="nav-link active py-1 px-3 me-2" data-bs-toggle="pill" data-bs-target="#pills-pending-lembur" type="button" role="tab">Menunggu Persetujuan</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                  <button class="nav-link py-1 px-3" data-bs-toggle="pill" data-bs-target="#pills-riwayat-lembur" type="button" role="tab">Riwayat Keputusan</button>
+                </li>
+              </ul>
+
+              <div class="tab-content" id="pills-tabContentLembur">
+                <div class="tab-pane fade show active" id="pills-pending-lembur" role="tabpanel">
+                  <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0" style="font-size: 12px;">
+                      <thead class="table-light text-muted">
+                        <tr><th>NAMA KARYAWAN</th><th>TIPE</th><th>TANGGAL & RENCANA JAM</th><th>ALASAN LEMBUR</th><th class="text-center">AKSI</th></tr>
+                      </thead>
+                      <tbody id="tabelAppvLembur"><tr><td colspan="5" class="text-center py-3 text-muted">Memuat data...</td></tr></tbody>
+                    </table>
+                  </div>
+                </div>
+                <div class="tab-pane fade" id="pills-riwayat-lembur" role="tabpanel">
+                  <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0" style="font-size: 12px;">
+                      <thead class="table-light text-muted">
+                        <tr><th>NAMA KARYAWAN</th><th>TIPE</th><th>TANGGAL</th><th>STATUS</th><th>DISETUJUI OLEH</th></tr>
+                      </thead>
+                      <tbody id="tabelRiwayatLembur"><tr><td colspan="5" class="text-center py-3 text-muted">Memuat data...</td></tr></tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div> 
+      </div> 
+    </div> 
+  </div> 
+
+    <div id="adminKiosQR" style="display: none; min-height: 100vh; background-color: #ffffff; color: #222;">
+    <div id="kiosHeader" class="p-3 d-flex justify-content-between align-items-center bg-white border-bottom" style="position: sticky; top: 0; z-index: 101;">
+      <div class="d-flex align-items-center gap-2">
+        <i class="bi bi-arrow-left fs-4 text-dark" onclick="kembaliKeAdmin()" style="cursor: pointer;"></i>
+        <h5 class="mb-0 fw-bold" style="color: #ea384d; font-size: 15px;">Kios Karyawan</h5>
+      </div>
+      <h6 class="mb-0 fw-bold text-dark" style="font-size: 15px;">Kios QR</h6>
+      <i id="fullScreenIcon" class="bi bi-fullscreen fs-5 text-dark" title="Layar Penuh" onclick="toggleFullScreen()" style="cursor: pointer;"></i>
+    </div>
+    <div id="kiosContent" class="d-flex flex-column align-items-center justify-content-center" style="height: 80vh;">
+      <h2 class="fw-bold mb-1 text-dark" style="font-size: 24px;">PT. Akarsa Garment</h2>
+      <p class="text-muted mb-4" style="font-size: 13px;">Silakan arahkan kamera HP Anda ke layar</p>
+      <div class="p-3 rounded-4 shadow-sm mb-3" style="border: 2px solid #ea384d; background: #fff; width: 280px; height: 280px; display: flex; align-items: center; justify-content: center; position: relative;">
+        <div id="qrContainer"></div> 
+      </div>
+      <div style="text-align: center;">
+        <div id="timerQR" style="font-size: 4.5rem; font-weight: 800; color: #ea384d; line-height: 1;">15</div>
+      </div>
+    </div>
+  </div>
+
+
+  <div class="modal fade" id="modalUploadArsip" tabindex="-1">
+    <div class="modal-dialog">
+      <div class="modal-content border-0 shadow-lg rounded-4">
+        <div class="modal-header text-white" style="background: linear-gradient(135deg, #1d4ed8, #3b82f6);">
+          <h6 class="modal-title fw-bold"><i class="bi bi-cloud-arrow-up me-2"></i>Upload Berkas Internal Baru</h6>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body bg-light">
+          <form id="formArsip">
+            <div class="mb-3">
+              <label class="form-label fw-bold" style="font-size:11px;">Nama Karyawan (Opsional)</label>
+              <input type="text" class="form-control form-control-sm" id="arsipKaryawan" placeholder="Ketik NIK - Nama (Kosongkan jika ini dokumen Umum/SOP)">
+            </div>
+            <div class="mb-3">
+              <label class="form-label fw-bold" style="font-size:11px;">Kategori Berkas</label>
+              <select class="form-select form-select-sm" id="arsipKategori">
+                <option value="Surat Peringatan (SP)">Surat Peringatan (SP)</option>
+                <option value="Surat Keputusan (SK)">Surat Keputusan (SK)</option>
+                <option value="Kontrak Kerja">Kontrak Kerja</option>
+                <option value="SOP / Peraturan">SOP / Peraturan Perusahaan</option>
+                <option value="Lainnya">Lainnya</option>
+              </select>
+            </div>
+            <div class="mb-3">
+              <label class="form-label fw-bold" style="font-size:11px;">Judul Dokumen (Wajib)</label>
+              <input type="text" class="form-control form-control-sm" id="arsipJudul" placeholder="Cth: SP 1 - Terlambat 3 Hari">
+            </div>
+            <div class="mb-3">
+              <label class="form-label fw-bold" style="font-size:11px;">Pilih File (PDF/Gambar)</label>
+              <input type="file" class="form-control form-control-sm" id="arsipFile" accept=".pdf, image/*">
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer border-0 bg-light">
+          <button type="button" class="btn btn-secondary fw-bold px-4" data-bs-dismiss="modal">Batal</button>
+          <button type="button" class="btn btn-primary fw-bold px-4" id="btnSimpanArsip" onclick="simpanArsip()"><i class="bi bi-upload me-2"></i>Unggah Arsip</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal fade" id="modalFormUser" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content border-0 shadow-lg rounded-3" style="font-size: 13px;">
+        <div class="modal-header border-0 bg-light rounded-top-3 py-2">
+          <h6 class="modal-title fw-bold text-dark" id="modalUserTitle">Tambah User Baru</h6>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body p-3">
+          <form id="formUser">
+            <div class="mb-2">
+              <label class="form-label fw-bold mb-1" style="font-size:12px;">Jenis Akun</label>
+              <select class="form-select form-select-sm" id="formJenisAkun" onchange="sesuaikanFormUser()">
+                <option value="KARYAWAN">Karyawan Absensi</option>
+                <option value="SISTEM">Admin Sistem</option>
+              </select>
+            </div>
+            <div class="mb-2">
+              <label class="form-label fw-bold mb-1" style="font-size:12px;" id="labelIdUser">NIK Karyawan</label>
+              <input type="text" class="form-control form-control-sm" id="formIdUser" placeholder="Cth: PEG-123" required>
+            </div>
+            <div class="mb-2">
+              <label class="form-label fw-bold mb-1" style="font-size:12px;">Nama Lengkap</label>
+              <input type="text" class="form-control form-control-sm" id="formNamaUser" required>
+            </div>
+            <div id="fieldKaryawan">
+              <div class="row g-2">
+                <div class="col-12 mb-2">
+                  <label class="form-label fw-bold mb-1" style="font-size:12px;">Departemen / Divisi</label>
+                  <input type="text" class="form-control form-control-sm" id="formDepartemen" placeholder="Cth: Produksi, Gudang, HRD...">
+                </div>
+                <div class="col-6 mb-2">
+                  <label class="form-label fw-bold mb-1" style="font-size:12px;">Jabatan</label>
+                  <input type="text" class="form-control form-control-sm" id="formJabatan" placeholder="Cth: Operator...">
+                </div>
+                <div class="col-6 mb-2">
+                  <label class="form-label fw-bold mb-1" style="font-size:12px;">Role Absen (Sistem)</label>
+                  <select class="form-select form-select-sm" id="formRoleKaryawan">
+                    <option value="Karyawan">Reguler</option>
+                    <option value="Driver">Bebas GPS (Driver)</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+            <div id="fieldAdmin" style="display: none;">
+              <div class="mb-2">
+                <label class="form-label fw-bold mb-1" style="font-size:12px;">Role Sistem</label>
+                <select class="form-select form-select-sm" id="formRoleSistem">
+                  <option value="Admin HR">Admin HR</option>
+                  <option value="SuperAdmin">SuperAdmin</option>
+                </select>
+              </div>
+            </div>
+            <div class="mb-2">
+              <label class="form-label fw-bold text-danger mb-1" style="font-size:12px;">PIN / Sandi Akses</label>
+              <input type="password" class="form-control form-control-sm" id="formPinUser" placeholder="Ketik sandi baru...">
+            </div>
+            <div class="mb-1">
+              <label class="form-label fw-bold mb-1" style="font-size:12px;">Status Akun</label>
+              <select class="form-select form-select-sm" id="formStatusUser">
+                <option value="Aktif">Aktif</option>
+                <option value="Nonaktif">Nonaktif (Blokir)</option>
+              </select>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer border-0 py-2">
+          <button type="button" class="btn btn-sm btn-light" data-bs-dismiss="modal">Batal</button>
+          <button type="button" class="btn btn-sm btn-danger px-3" onclick="simpanDataUser()">Simpan Data</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal fade" id="modalEditProfil" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+      <div class="modal-content shadow-lg border-0 rounded-4">
+        <div class="modal-header text-white" style="background: linear-gradient(135deg, #1d4ed8, #3b82f6);">
+          <h5 class="modal-title fw-bold"><i class="bi bi-person-lines-fill me-2"></i>Lengkapi Profil Karyawan</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body bg-light">
+          
+          <div class="d-flex align-items-center mb-3 p-3 bg-white rounded border shadow-sm">
+            <div class="bg-primary-subtle text-primary rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 50px; height: 50px;">
+              <i class="bi bi-person-badge fs-3"></i>
+            </div>
+            <div>
+              <h6 class="fw-bold mb-0" id="epNamaHeader">Memuat Nama...</h6>
+              <small class="text-muted" id="epNikHeader">NIK: -</small>
+            </div>
+            <input type="hidden" id="epNikHidden">
+            <input type="hidden" id="epOldFoto"><input type="hidden" id="epOldKtp">
+            <input type="hidden" id="epOldKk"><input type="hidden" id="epOldCv"><input type="hidden" id="epOldIjazah">
+          </div>
+
+          <ul class="nav nav-tabs nav-fill mb-3 shadow-sm rounded bg-white" id="profilTabs">
+            <li class="nav-item"><button class="nav-link active fw-bold" data-bs-toggle="tab" data-bs-target="#pane-pribadi" type="button"><i class="bi bi-person-vcard me-1"></i> Pribadi</button></li>
+            <li class="nav-item"><button class="nav-link fw-bold" data-bs-toggle="tab" data-bs-target="#pane-kerja" type="button"><i class="bi bi-briefcase me-1"></i> Kepegawaian</button></li>
+            <li class="nav-item"><button class="nav-link fw-bold" data-bs-toggle="tab" data-bs-target="#pane-kontak" type="button"><i class="bi bi-telephone me-1"></i> Kontak</button></li>
+            <li class="nav-item"><button class="nav-link fw-bold" data-bs-toggle="tab" data-bs-target="#pane-finansial" type="button"><i class="bi bi-wallet2 me-1"></i> Finansial</button></li>
+            <li class="nav-item"><button class="nav-link fw-bold text-success" data-bs-toggle="tab" data-bs-target="#pane-berkas" type="button"><i class="bi bi-cloud-arrow-up me-1"></i> Berkas</button></li>
+          </ul>
+
+          <form id="formEditProfilLengkap">
+            <div class="tab-content bg-white p-3 rounded border shadow-sm">
+              <div class="tab-pane fade show active" id="pane-pribadi">
+                <div class="row g-2">
+                  <div class="col-md-6 mb-2"><label class="form-label fw-bold mb-1" style="font-size:11px;">NIK KTP</label><input type="number" class="form-control form-control-sm" id="epNikKtp"></div>
+                  <div class="col-md-6 mb-2"><label class="form-label fw-bold mb-1" style="font-size:11px;">Nama Ibu Kandung</label><input type="text" class="form-control form-control-sm" id="epIbu"></div>
+                  <div class="col-md-6 mb-2"><label class="form-label fw-bold mb-1" style="font-size:11px;">Tempat Lahir</label><input type="text" class="form-control form-control-sm" id="epTempatLahir"></div>
+                  <div class="col-md-6 mb-2"><label class="form-label fw-bold mb-1" style="font-size:11px;">Tanggal Lahir</label><input type="date" class="form-control form-control-sm" id="epTglLahir"></div>
+                  <div class="col-md-3 mb-2"><label class="form-label fw-bold mb-1" style="font-size:11px;">Jenis Kelamin</label><select class="form-select form-select-sm" id="epJk"><option value="Laki-Laki">Laki-Laki</option><option value="Perempuan">Perempuan</option></select></div>
+                  <div class="col-md-3 mb-2"><label class="form-label fw-bold mb-1" style="font-size:11px;">Gol. Darah</label><select class="form-select form-select-sm" id="epDarah"><option value="-">-</option><option value="A">A</option><option value="B">B</option><option value="AB">AB</option><option value="O">O</option></select></div>
+                  <div class="col-md-3 mb-2"><label class="form-label fw-bold mb-1" style="font-size:11px;">Agama</label><select class="form-select form-select-sm" id="epAgama"><option value="Islam">Islam</option><option value="Kristen">Kristen</option><option value="Katolik">Katolik</option><option value="Hindu">Hindu</option><option value="Buddha">Buddha</option><option value="Konghucu">Konghucu</option></select></div>
+                  <div class="col-md-3 mb-2"><label class="form-label fw-bold mb-1" style="font-size:11px;">Status Nikah</label><select class="form-select form-select-sm" id="epNikah"><option value="Lajang">Lajang</option><option value="Menikah">Menikah</option><option value="Cerai">Cerai</option></select></div>
+                  <div class="col-12 mb-2"><label class="form-label fw-bold mb-1" style="font-size:11px;">Alamat Sesuai KTP</label><textarea class="form-control form-control-sm" id="epAlamatKtp" rows="2"></textarea></div>
+                  <div class="col-12 mb-2"><label class="form-label fw-bold mb-1" style="font-size:11px;">Alamat Domisili</label><textarea class="form-control form-control-sm" id="epAlamatDomisili" rows="2"></textarea></div>
+                  <div class="col-md-6"><label class="form-label fw-bold mb-1" style="font-size:11px;">Pendidikan Terakhir</label><select class="form-select form-select-sm" id="epPendidikan"><option value="-">-</option><option value="SMA">SMA / SMK</option><option value="D3">Diploma 3 (D3)</option><option value="S1">Sarjana (S1)</option></select></div>
+                </div>
+              </div>
+
+              <div class="tab-pane fade" id="pane-kerja">
+                <div class="row g-2">
+                  <div class="col-md-6 mb-2"><label class="form-label fw-bold mb-1" style="font-size:11px;">Departemen</label><input type="text" class="form-control form-control-sm" id="epDept"></div>
+                  <div class="col-md-6 mb-2"><label class="form-label fw-bold mb-1" style="font-size:11px;">Jabatan</label><input type="text" class="form-control form-control-sm" id="epJabatan"></div>
+                  <div class="col-md-4 mb-2"><label class="form-label fw-bold mb-1" style="font-size:11px;">Grade</label><input type="text" class="form-control form-control-sm" id="epGrade"></div>
+                  <div class="col-md-4 mb-2"><label class="form-label fw-bold mb-1" style="font-size:11px;">Tanggal Bergabung</label><input type="date" class="form-control form-control-sm" id="epTglGabung"></div>
+                  <div class="col-md-4 mb-2"><label class="form-label fw-bold mb-1" style="font-size:11px;">Sisa Cuti</label><input type="number" class="form-control form-control-sm" id="epSisaCuti" value="0"></div>
+                  <div class="col-md-6 mb-2"><label class="form-label fw-bold mb-1" style="font-size:11px;">Status Karyawan</label><select class="form-select form-select-sm" id="epStatusKaryawan"><option value="TETAP">Tetap (PKWTT)</option><option value="KONTRAK">Kontrak (PKWT)</option><option value="PROBATION">Probation</option></select></div>
+                  <div class="col-md-6 mb-2"><label class="form-label fw-bold mb-1 text-danger" style="font-size:11px;">Batas Akhir Kontrak</label><input type="date" class="form-control form-control-sm" id="epTglKontrak"></div>
+                  
+                  <div class="col-12 mt-3 pt-2 border-top">
+                    <label class="form-label fw-bold mb-1 text-primary" style="font-size:11px;">Upload Foto Profil Baru (Opsional)</label>
+                    <input type="file" class="form-control form-control-sm" id="epUploadFoto" accept="image/*">
+                    <div id="linkLamaFoto" class="mt-1" style="font-size:10px;"></div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="tab-pane fade" id="pane-kontak">
+                <div class="row g-2">
+                  <div class="col-md-6 mb-2"><label class="form-label fw-bold mb-1" style="font-size:11px;">No. HP Aktif</label><input type="number" class="form-control form-control-sm" id="epHp"></div>
+                  <div class="col-md-6 mb-2"><label class="form-label fw-bold mb-1" style="font-size:11px;">Email Pribadi</label><input type="email" class="form-control form-control-sm" id="epEmail"></div>
+                  <div class="col-md-12 mb-2"><label class="form-label fw-bold mb-1 mt-2 text-danger" style="font-size:11px;">Nama Kontak Darurat</label><input type="text" class="form-control form-control-sm" id="epNamaDarurat"></div>
+                  <div class="col-md-6 mb-2"><label class="form-label fw-bold mb-1" style="font-size:11px;">Hubungan Darurat</label><input type="text" class="form-control form-control-sm" id="epHubDarurat" placeholder="Cth: Istri/Suami"></div>
+                  <div class="col-md-6 mb-2"><label class="form-label fw-bold mb-1" style="font-size:11px;">No. HP Darurat</label><input type="number" class="form-control form-control-sm" id="epHpDarurat"></div>
+                </div>
+              </div>
+              <div class="tab-pane fade" id="pane-finansial">
+                <div class="row g-2">
+                  <div class="col-md-4 mb-2"><label class="form-label fw-bold mb-1" style="font-size:11px;">Nama Bank</label><input type="text" class="form-control form-control-sm" id="epBank"></div>
+                  <div class="col-md-8 mb-2"><label class="form-label fw-bold mb-1" style="font-size:11px;">Nomor Rekening</label><input type="number" class="form-control form-control-sm" id="epRekening"></div>
+                  <div class="col-md-12 mb-2"><label class="form-label fw-bold mb-1" style="font-size:11px;">BPJS Kesehatan</label><input type="number" class="form-control form-control-sm" id="epBpjsKes"></div>
+                  <div class="col-md-12 mb-2"><label class="form-label fw-bold mb-1" style="font-size:11px;">BPJS Ketenagakerjaan</label><input type="number" class="form-control form-control-sm" id="epBpjsTk"></div>
+                  <div class="col-md-12 mb-2"><label class="form-label fw-bold mb-1" style="font-size:11px;">NPWP</label><input type="text" class="form-control form-control-sm" id="epNpwp"></div>
+                </div>
+              </div>
+
+              <div class="tab-pane fade" id="pane-berkas">
+                <div class="alert alert-info py-2" style="font-size: 11px;"><i class="bi bi-info-circle me-1"></i> Format: JPG, PNG, atau PDF. Maksimal 3MB per file.</div>
+                <div class="row g-3">
+                  <div class="col-md-6">
+                    <label class="form-label fw-bold mb-1" style="font-size:11px;">Scan KTP</label>
+                    <input type="file" class="form-control form-control-sm" id="epUploadKtp" accept="image/*,.pdf">
+                    <div id="linkLamaKtp" class="mt-1" style="font-size:10px;"></div>
+                  </div>
+                  <div class="col-md-6">
+                    <label class="form-label fw-bold mb-1" style="font-size:11px;">Scan Kartu Keluarga (KK)</label>
+                    <input type="file" class="form-control form-control-sm" id="epUploadKk" accept="image/*,.pdf">
+                    <div id="linkLamaKk" class="mt-1" style="font-size:10px;"></div>
+                  </div>
+                  <div class="col-md-6">
+                    <label class="form-label fw-bold mb-1" style="font-size:11px;">CV / Resume</label>
+                    <input type="file" class="form-control form-control-sm" id="epUploadCv" accept="image/*,.pdf">
+                    <div id="linkLamaCv" class="mt-1" style="font-size:10px;"></div>
+                  </div>
+                  <div class="col-md-6">
+                    <label class="form-label fw-bold mb-1" style="font-size:11px;">Ijazah Terakhir</label>
+                    <input type="file" class="form-control form-control-sm" id="epUploadIjazah" accept="image/*,.pdf">
+                    <div id="linkLamaIjazah" class="mt-1" style="font-size:10px;"></div>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+          </form>
+          
+        </div>
+        <div class="modal-footer bg-light border-0">
+          <button type="button" class="btn btn-secondary fw-bold px-4" data-bs-dismiss="modal">Batal</button>
+          <button type="button" class="btn btn-success fw-bold px-4" id="btnSimpanProfilLengkap" onclick="simpanProfilLengkap()"><i class="bi bi-cloud-arrow-up me-2"></i>Unggah & Simpan</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal fade" id="modalResign" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content rounded-4 border-0 shadow">
+      <div class="modal-header bg-danger text-white">
+        <h5 class="modal-title fw-bold" style="font-size: 15px;"><i class="bi bi-door-open-fill me-2"></i>Proses Offboarding (Resign)</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body p-4">
+        <div class="alert alert-warning p-2 text-dark" style="font-size: 12px;">
+          Anda akan memproses penonaktifan untuk: <br><strong id="namaResignTarget" class="fs-6"></strong> (<span id="nikResignTarget"></span>)
+        </div>
+        <div class="mb-3">
+          <label class="form-label fw-bold" style="font-size: 12px;">Tipe Keluar</label>
+          <select class="form-select" id="tipeResign">
+            <option value="One Month Notice">Resign Baik-baik (One Month Notice)</option>
+            <option value="Diberhentikan (PHK)">Diberhentikan (PHK)</option>
+            <option value="Mangkir (Kabur)">Mangkir (Kabur)</option>
+          </select>
+        </div>
+        <div class="mb-3">
+          <label class="form-label fw-bold" style="font-size: 12px;">Tanggal Efektif Terakhir Bekerja</label>
+          <input type="date" class="form-control" id="tglEfektifResign">
+          <div class="form-text" style="font-size: 10px;">Sistem akan memblokir akun secara otomatis setelah tanggal ini lewat.</div>
+        </div>
+        <div class="mb-3">
+          <label class="form-label fw-bold" style="font-size: 12px;">Alasan / Catatan HRD</label>
+          <textarea class="form-control" id="alasanResign" rows="3" placeholder="Tuliskan catatan alasan keluar (Wajib untuk arsip)..."></textarea>
+        </div>
+      </div>
+      <div class="modal-footer bg-light">
+        <button type="button" class="btn btn-secondary btn-sm fw-bold rounded-pill px-3" data-bs-dismiss="modal">Batal</button>
+        <button type="button" class="btn btn-danger btn-sm fw-bold rounded-pill px-3 shadow-sm" onclick="simpanResign()"><i class="bi bi-save me-1"></i>Simpan & Proses</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+  <div class="modal fade" id="modalTimelineKarir" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+      <div class="modal-content rounded-4 border-0 shadow-lg">
+        <div class="modal-header text-white" style="background: linear-gradient(135deg, #1e3a8a, #3b82f6);">
+          <h6 class="modal-title fw-bold" style="font-size: 14px;"><i class="bi bi-signpost-split-fill me-2"></i>Jejak Karir & Mutasi</h6>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body bg-light p-4">
+          <div id="timelineContainer" class="position-relative">
+             <!-- Data akan dirender oleh Javascript di sini -->
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal fade" id="modalRiwayatAbsen" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-fullscreen-sm-down">
+      <div class="modal-content border-0 shadow-lg rounded-4">
+        <div class="modal-header text-white" style="background: linear-gradient(135deg, #ea384d, #d31027);">
+          <h6 class="modal-title fw-bold" style="font-size: 15px;"><i class="bi bi-clock-history me-2"></i>Riwayat Kehadiran</h6>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body bg-light p-3">
+          
+          <div class="mb-3">
+            <label class="form-label fw-bold text-muted" style="font-size: 11px;">Pilih Bulan</label>
+            <input type="month" class="form-control form-control-sm border-danger fw-bold" id="bulanRiwayat" onchange="bukaRiwayatAbsen(this.value)">
+          </div>
+          
+          <div class="row g-2 mb-4">
+            <div class="col-4">
+              <div class="bg-white p-2 rounded-3 shadow-sm text-center border-bottom border-success border-3">
+                <div class="fw-bold text-success" style="font-size: 18px;" id="rekHadir">0</div>
+                <div class="text-muted" style="font-size: 10px; font-weight: 800;">HADIR</div>
+              </div>
+            </div>
+            <div class="col-4">
+              <div class="bg-white p-2 rounded-3 shadow-sm text-center border-bottom border-warning border-3">
+                <div class="fw-bold text-warning" style="font-size: 18px;" id="rekTelat">0</div>
+                <div class="text-muted" style="font-size: 10px; font-weight: 800;">TELAT</div>
+              </div>
+            </div>
+            <div class="col-4">
+              <div class="bg-white p-2 rounded-3 shadow-sm text-center border-bottom border-primary border-3">
+                <div class="fw-bold text-primary" style="font-size: 18px;" id="rekDinas">0</div>
+                <div class="text-muted" style="font-size: 10px; font-weight: 800;">DINAS</div>
+              </div>
+            </div>
+          </div>
+
+          <h6 class="fw-bold text-dark mb-2" style="font-size: 13px;"><i class="bi bi-list-check text-danger me-1"></i>Detail Harian</h6>
+          <div id="wadahListRiwayat">
+            </div>
+          
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>
