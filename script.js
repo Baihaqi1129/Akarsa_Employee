@@ -1266,46 +1266,55 @@ async function bukaModalEditProfilLengkap(nik, btnElement) {
   btnElement.innerHTML = '<span class="spinner-border spinner-border-sm"></span>'; btnElement.disabled = true;
 
   try {
+    // V2: Gunakan endpoint get_profil
     const response = await fetch(API_URL, {
-      method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify({ action: "get_user_detail", nik: nik })
+      method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify({ action: "get_profil", nik: nik })
     });
     const res = await response.json();
 
     if (res.status === "SUKSES") {
-      const d = res.data; 
+      const p = res.profil; // V2 menggunakan bungkusan objek 'profil'
       
-      document.getElementById('epNamaHeader').innerText = d[1]; document.getElementById('epNikHeader').innerText = "NIK: " + d[0]; document.getElementById('epNikHidden').value = d[0];
+      document.getElementById('epNamaHeader').innerText = p.nama; 
+      document.getElementById('epNikHeader').innerText = "NIK: " + p.nik; 
+      document.getElementById('epNikHidden').value = p.nik;
       
       // RESET FORM FILE & TAB
       document.getElementById('formEditProfilLengkap').reset();
       new bootstrap.Tab(document.querySelector('#profilTabs button[data-bs-target="#pane-pribadi"]')).show();
 
-      // SIMPAN URL LAMA JIKA ADA, AGAR TIDAK HILANG SAAT DISIMPAN
-      document.getElementById('epOldFoto').value = d[2];
-      document.getElementById('epOldKtp').value = d[32];
-      document.getElementById('epOldKk').value = d[33];
-      document.getElementById('epOldCv').value = d[34];
-      document.getElementById('epOldIjazah').value = d[35];
-
-      // TAMPILKAN STATUS BERKAS LAMA DI BAWAH TOMBOL UPLOAD
-      const buatLinkLama = (idHtml, url, namaBerkas) => {
-        const el = document.getElementById(idHtml);
-        if (url && url.length > 10 && url !== "-") el.innerHTML = `<span class="text-success"><i class="bi bi-check-circle-fill"></i> Sudah ada file: <a href="${url}" target="_blank">Lihat ${namaBerkas}</a></span>`;
-        else el.innerHTML = `<span class="text-danger"><i class="bi bi-x-circle-fill"></i> Belum ada file terunggah.</span>`;
-      };
-      buatLinkLama('linkLamaFoto', d[2], 'Foto'); buatLinkLama('linkLamaKtp', d[32], 'KTP'); buatLinkLama('linkLamaKk', d[33], 'KK'); buatLinkLama('linkLamaCv', d[34], 'CV'); buatLinkLama('linkLamaIjazah', d[35], 'Ijazah');
-
-      // ISI TEKS BIODATA
-      document.getElementById('epNikKtp').value = d[3] !== "-" ? d[3] : ""; document.getElementById('epTempatLahir').value = d[4] !== "-" ? d[4] : "";
-      if(d[5] && d[5] !== "-") { let tgl = new Date(d[5]); if(!isNaN(tgl)) document.getElementById('epTglLahir').value = tgl.toISOString().split('T')[0]; }
-      document.getElementById('epJk').value = d[6] !== "-" ? d[6] : "Laki-Laki"; document.getElementById('epDarah').value = d[7] !== "-" ? d[7] : "-"; document.getElementById('epAgama').value = d[8] !== "-" ? d[8] : "Islam"; document.getElementById('epNikah').value = d[9] !== "-" ? d[9] : "Lajang"; document.getElementById('epPendidikan').value = d[10] !== "-" ? d[10] : "-"; document.getElementById('epAlamatKtp').value = d[11] !== "-" ? d[11] : ""; document.getElementById('epAlamatDomisili').value = d[12] !== "-" ? d[12] : ""; document.getElementById('epIbu').value = d[13] !== "-" ? d[13] : "";
-      document.getElementById('epEmail').value = d[14] !== "-" ? d[14] : ""; document.getElementById('epHp').value = d[15] !== "-" ? d[15] : ""; document.getElementById('epNamaDarurat').value = d[16] !== "-" ? d[16] : ""; document.getElementById('epHubDarurat').value = d[17] !== "-" ? d[17] : ""; document.getElementById('epHpDarurat').value = d[18] !== "-" ? d[18] : "";
-      document.getElementById('epDept').value = d[19] !== "-" ? d[19] : ""; document.getElementById('epJabatan').value = d[20] !== "-" ? d[20] : ""; document.getElementById('epGrade').value = d[21] !== "-" ? d[21] : "";
-      if(d[22] && d[22] !== "-") { let tgl = new Date(d[22]); if(!isNaN(tgl)) document.getElementById('epTglGabung').value = tgl.toISOString().split('T')[0]; }
-      document.getElementById('epStatusKaryawan').value = d[23] !== "-" ? d[23] : "TETAP";
-      if(d[25] && d[25] !== "-") { let tgl = new Date(d[25]); if(!isNaN(tgl)) document.getElementById('epTglKontrak').value = tgl.toISOString().split('T')[0]; }
-      document.getElementById('epSisaCuti').value = d[26] !== "-" ? d[26] : "0";
-      document.getElementById('epBpjsKes').value = d[27] !== "-" ? d[27] : ""; document.getElementById('epBpjsTk').value = d[28] !== "-" ? d[28] : ""; document.getElementById('epNpwp').value = d[29] !== "-" ? d[29] : ""; document.getElementById('epBank').value = d[30] !== "-" ? d[30] : ""; document.getElementById('epRekening').value = d[31] !== "-" ? d[31] : "";
+      // ISI TEKS BIODATA (Menggunakan Object Key V2, bukan Array d[x])
+      document.getElementById('epNikKtp').value = p.nikKtp !== "-" ? p.nikKtp : ""; 
+      document.getElementById('epTempatLahir').value = p.tempatLahir !== "-" ? p.tempatLahir : "";
+      if(p.tglLahir && p.tglLahir !== "-") document.getElementById('epTglLahir').value = p.tglLahir;
+      document.getElementById('epJk').value = p.jenisKelamin !== "-" ? p.jenisKelamin : "Laki-Laki"; 
+      document.getElementById('epDarah').value = p.golDarah !== "-" ? p.golDarah : "-"; 
+      document.getElementById('epAgama').value = p.agama !== "-" ? p.agama : "Islam"; 
+      document.getElementById('epNikah').value = p.statusNikah !== "-" ? p.statusNikah : "Lajang"; 
+      document.getElementById('epPendidikan').value = p.pendidikan !== "-" ? p.pendidikan : "-"; 
+      document.getElementById('epAlamatKtp').value = p.alamatKtp !== "-" ? p.alamatKtp : ""; 
+      document.getElementById('epAlamatDomisili').value = p.alamatDomisili !== "-" ? p.alamatDomisili : ""; 
+      document.getElementById('epIbu').value = p.namaIbu !== "-" ? p.namaIbu : "";
+      
+      document.getElementById('epEmail').value = p.email !== "-" ? p.email : ""; 
+      document.getElementById('epHp').value = p.nomorHp !== "-" ? p.nomorHp : ""; 
+      document.getElementById('epNamaDarurat').value = p.namaDarurat !== "-" ? p.namaDarurat : ""; 
+      document.getElementById('epHubDarurat').value = p.hubunganDarurat !== "-" ? p.hubunganDarurat : ""; 
+      document.getElementById('epHpDarurat').value = p.hpDarurat !== "-" ? p.hpDarurat : "";
+      
+      document.getElementById('epDept').value = p.dept !== "-" ? p.dept : ""; 
+      document.getElementById('epJabatan').value = p.jabatan !== "-" ? p.jabatan : ""; 
+      document.getElementById('epGrade').value = p.grade !== "-" ? p.grade : "";
+      if(p.tglGabung && p.tglGabung !== "-") document.getElementById('epTglGabung').value = p.tglGabung; 
+      document.getElementById('epStatusKaryawan').value = p.statusKaryawan !== "-" ? p.statusKaryawan : "TETAP";
+      if(p.tglKontrak && p.tglKontrak !== "-") document.getElementById('epTglKontrak').value = p.tglKontrak; 
+      document.getElementById('epSisaCuti').value = p.sisaCuti !== "-" ? p.sisaCuti : "0";
+      
+      document.getElementById('epBpjsKes').value = p.bpjsKesehatan !== "-" ? p.bpjsKesehatan : ""; 
+      document.getElementById('epBpjsTk').value = p.bpjsKetenagakerjaan !== "-" ? p.bpjsKetenagakerjaan : ""; 
+      document.getElementById('epNpwp').value = p.npwp !== "-" ? p.npwp : ""; 
+      document.getElementById('epBank').value = p.bank !== "-" ? p.bank : ""; 
+      document.getElementById('epRekening').value = p.rekening !== "-" ? p.rekening : "";
 
       new bootstrap.Modal(document.getElementById('modalEditProfil')).show();
     } else { alert("⚠️ " + res.pesan); }
@@ -1315,17 +1324,6 @@ async function bukaModalEditProfilLengkap(nik, btnElement) {
 async function simpanProfilLengkap() {
   const btn = document.getElementById('btnSimpanProfilLengkap');
   btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Mengunggah File & Data...'; btn.disabled = true;
-
-  let d = new Array(36).fill("-"); // 36 Kolom Database
-
-  // Masukkan data teks
-  d[0] = document.getElementById('epNikHidden').value; d[1] = document.getElementById('epNamaHeader').innerText;
-  d[2] = document.getElementById('epOldFoto').value || "-"; // Foto lama (akan ditimpa GS jika ada upload baru)
-  d[3] = document.getElementById('epNikKtp').value || "-"; d[4] = document.getElementById('epTempatLahir').value || "-"; d[5] = document.getElementById('epTglLahir').value || "-"; d[6] = document.getElementById('epJk').value || "-"; d[7] = document.getElementById('epDarah').value || "-"; d[8] = document.getElementById('epAgama').value || "-"; d[9] = document.getElementById('epNikah').value || "-"; d[10] = document.getElementById('epPendidikan').value || "-"; d[11] = document.getElementById('epAlamatKtp').value || "-"; d[12] = document.getElementById('epAlamatDomisili').value || "-"; d[13] = document.getElementById('epIbu').value || "-"; d[14] = document.getElementById('epEmail').value || "-"; d[15] = document.getElementById('epHp').value || "-"; d[16] = document.getElementById('epNamaDarurat').value || "-"; d[17] = document.getElementById('epHubDarurat').value || "-"; d[18] = document.getElementById('epHpDarurat').value || "-"; d[19] = document.getElementById('epDept').value || "-"; d[20] = document.getElementById('epJabatan').value || "-"; d[21] = document.getElementById('epGrade').value || "-"; d[22] = document.getElementById('epTglGabung').value || "-"; d[23] = document.getElementById('epStatusKaryawan').value || "-"; d[24] = "Aktif"; d[25] = document.getElementById('epTglKontrak').value || "-"; d[26] = document.getElementById('epSisaCuti').value || "0"; d[27] = document.getElementById('epBpjsKes').value || "-"; d[28] = document.getElementById('epBpjsTk').value || "-"; d[29] = document.getElementById('epNpwp').value || "-"; d[30] = document.getElementById('epBank').value || "-"; d[31] = document.getElementById('epRekening').value || "-";
-  d[32] = document.getElementById('epOldKtp').value || "-";
-  d[33] = document.getElementById('epOldKk').value || "-";
-  d[34] = document.getElementById('epOldCv').value || "-";
-  d[35] = document.getElementById('epOldIjazah').value || "-";
 
   // PROSES KONVERSI FILE KE BASE64
   const getFileBase64 = async (idHtml) => {
@@ -1338,16 +1336,46 @@ async function simpanProfilLengkap() {
   };
 
   const payload = {
-  action: "update_user_profil", 
-  nik: d[0], 
-  dataUpdate: d,
-  // Ini adalah "kabel" yang menghubungkan HTML ke mesin Google Drive
-  fileFoto: await getFileBase64('epUploadFoto'),
-  fileKtp: await getFileBase64('epUploadKtp'),
-  fileKk: await getFileBase64('epUploadKk'),
-  fileCv: await getFileBase64('epUploadCv'),
-  fileIjazah: await getFileBase64('epUploadIjazah')
-};
+    action: "update_user_profil", 
+    nik: document.getElementById('epNikHidden').value, 
+    
+    // Data Teks dikirim pakai Keys langsung (V2 Standard)
+    nikKtp: document.getElementById('epNikKtp').value || "-",
+    namaIbu: document.getElementById('epIbu').value || "-",
+    tempatLahir: document.getElementById('epTempatLahir').value || "-",
+    tglLahir: document.getElementById('epTglLahir').value || "-",
+    jenisKelamin: document.getElementById('epJk').value || "-",
+    golDarah: document.getElementById('epDarah').value || "-",
+    agama: document.getElementById('epAgama').value || "-",
+    statusNikah: document.getElementById('epNikah').value || "-",
+    alamatKtp: document.getElementById('epAlamatKtp').value || "-",
+    alamatDomisili: document.getElementById('epAlamatDomisili').value || "-",
+    pendidikan: document.getElementById('epPendidikan').value || "-",
+    dept: document.getElementById('epDept').value || "-",
+    jabatan: document.getElementById('epJabatan').value || "-",
+    grade: document.getElementById('epGrade').value || "-",
+    tglGabung: document.getElementById('epTglGabung').value || "-",
+    sisaCuti: document.getElementById('epSisaCuti').value || "0",
+    statusKaryawan: document.getElementById('epStatusKaryawan').value || "-",
+    tglKontrak: document.getElementById('epTglKontrak').value || "-",
+    nomorHp: document.getElementById('epHp').value || "-",
+    email: document.getElementById('epEmail').value || "-",
+    namaDarurat: document.getElementById('epNamaDarurat').value || "-",
+    hubunganDarurat: document.getElementById('epHubDarurat').value || "-",
+    hpDarurat: document.getElementById('epHpDarurat').value || "-",
+    bank: document.getElementById('epBank').value || "-",
+    rekening: document.getElementById('epRekening').value || "-",
+    bpjsKesehatan: document.getElementById('epBpjsKes').value || "-",
+    bpjsKetenagakerjaan: document.getElementById('epBpjsTk').value || "-",
+    npwp: document.getElementById('epNpwp').value || "-",
+    
+    // Berkas File
+    fileFoto: await getFileBase64('epUploadFoto'),
+    fileKtp: await getFileBase64('epUploadKtp'),
+    fileKk: await getFileBase64('epUploadKk'),
+    fileCv: await getFileBase64('epUploadCv'),
+    fileIjazah: await getFileBase64('epUploadIjazah')
+  };
 
   try {
     const response = await fetch(API_URL, { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify(payload) });
@@ -1782,16 +1810,17 @@ document.addEventListener('click', function(e) { if(e.target.id !== 'inputCariMu
 async function tarikDetailLamaKaryawan(nik) {
   document.getElementById('mutDeptLama').value = "Loading...";
   try {
-    const res = await fetch(API_URL, { method: "POST", body: JSON.stringify({ action: "get_detail_karyawan", nik: nik }) }).then(r => r.json());
+    const res = await fetch(API_URL, { method: "POST", body: JSON.stringify({ action: "get_profil", nik: nik }) }).then(r => r.json());
     if (res.status === "SUKSES") {
-       document.getElementById('mutDeptLama').value = res.data.dept;
-       document.getElementById('mutDeptBaru').value = res.data.dept; 
+       const p = res.profil; // Gunakan res.profil karena V2
+       document.getElementById('mutDeptLama').value = p.dept;
+       document.getElementById('mutDeptBaru').value = p.dept; 
        
-       document.getElementById('mutJabatanLama').value = res.data.jabatan;
-       document.getElementById('mutJabatanBaru').value = res.data.jabatan;
+       document.getElementById('mutJabatanLama').value = p.jabatan;
+       document.getElementById('mutJabatanBaru').value = p.jabatan;
        
-       document.getElementById('mutGradeLama').value = res.data.grade;
-       document.getElementById('mutGradeBaru').value = res.data.grade;
+       document.getElementById('mutGradeLama').value = p.grade;
+       document.getElementById('mutGradeBaru').value = p.grade;
     }
   } catch(e) { alert("Gagal menarik data detail karyawan."); }
 }
