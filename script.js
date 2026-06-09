@@ -1516,8 +1516,8 @@ function toggleNotifTarget() {
 }
 
 async function kirimPengumuman() {
-  const target = document.getElementById('notifTarget').value;
-  const niks = document.getElementById('notifTargetNik').value;
+  const target = document.getElementById('inputNikBroadcast').value = "";
+  const niks = document.getElementById('inputNikBroadcast').value;
   const tipe = document.getElementById('notifTipe').value;
   const judul = document.getElementById('notifJudul').value.trim();
   const pesan = document.getElementById('notifPesan').value.trim();
@@ -1573,9 +1573,6 @@ async function kirimPengumuman() {
 // ==========================================
 // --- MODUL APPROVAL PENGAJUAN (ADMIN) ---
 // ==========================================
-// ==========================================
-// --- MODUL APPROVAL PENGAJUAN (ADMIN) ---
-// ==========================================
 async function loadApprovalHR() {
   const tP = { c: document.getElementById('tabelAppvCuti'), l: document.getElementById('tabelAppvLembur') };
   const tR = { c: document.getElementById('tabelRiwayatCuti'), l: document.getElementById('tabelRiwayatLembur') };
@@ -1598,9 +1595,8 @@ async function loadApprovalHR() {
         let tgl = p.tglMulai.split('T')[0];
         if (p.tglMulai !== p.tglSelesai && p.tglSelesai) tgl += " s/d " + p.tglSelesai.split('T')[0];
         
-        let btn = `<button class="btn btn-sm btn-success py-1 px-2 me-1 shadow-sm" onclick="prosesApproval(${p.id}, true)" title="Setujui"><i class="bi bi-check-circle-fill"></i></button>
-                   <button class="btn btn-sm btn-danger py-1 px-2 shadow-sm" onclick="prosesApproval(${p.id}, false)" title="Tolak"><i class="bi bi-x-circle-fill"></i></button>`;
-
+        let btn = `<button class="btn btn-sm btn-success py-1 px-2 me-1 shadow-sm" onclick="prosesApproval('${p.id}', true)" title="Setujui"><i class="bi bi-check-circle-fill"></i></button>
+           <button class="btn btn-sm btn-danger py-1 px-2 shadow-sm" onclick="prosesApproval('${p.id}', false)" title="Tolak"><i class="bi bi-x-circle-fill"></i></button>`;
         let row = `<tr>
           <td class="fw-bold">${p.nama} <br><span class="text-muted" style="font-size:10px;">${p.nik}</span></td>
           <td><span class="badge bg-primary">${p.tipe}</span></td>
