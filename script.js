@@ -1,7 +1,8 @@
 // ==========================================
 // --- KONFIGURASI API ---
 // ==========================================
-const API_URL = "https://script.google.com/macros/s/AKfycbw79f6kuQ2Cgxt-t5EBwA6zy4m1Xp1Cf_8tZF1CcbOCY00OAFFn-yeoWcPx4FRhfDMp/exec"; 
+// API_URL sekarang menembak ke Terowongan Agen Rahasia Netlify kita!
+const API_URL = "/.netlify/functions/api"; 
 let userAktif = null; 
 let isModeKioskMurni = false;
 
