@@ -79,7 +79,6 @@ async function prosesLogin() {
 }
 function logout() {
   if (confirm('Apakah Anda yakin ingin keluar?')) {
-    document.getElementById('dashboardKaryawan').style.display = 'none';
     document.getElementById('dashboardAdmin').style.display = 'none';
     document.getElementById('loginSection').style.display = 'flex';
     document.getElementById('nik').value = '';
@@ -484,16 +483,43 @@ async function simpanPengaturan() {
 // --- PENGATUR JEBAKAN ROUTER ---
 // ==========================================
 function aturLaluLintasTampilan() {
-  const urlParams = new URLSearchParams(window.location.search); const view = urlParams.get('v');
-  document.getElementById('loginSection').style.display = 'none'; document.getElementById('dashboardKaryawan').style.display = 'none'; document.getElementById('dashboardAdmin').style.display = 'none'; document.getElementById('adminKiosQR').style.display = 'none';
+  const urlParams = new URLSearchParams(window.location.search); 
+  const view = urlParams.get('v');
+  
+  // 1. Sembunyikan semua section (dashboardKaryawan sudah dihapus dari sini agar tidak error)
+  document.getElementById('loginSection').style.display = 'none'; 
+  document.getElementById('dashboardAdmin').style.display = 'none'; 
+  document.getElementById('adminKiosQR').style.display = 'none';
+  
+  // 2. Tampilkan sesuai URL Parameter
   if (view === 'kiosk') {
-    isModeKioskMurni = true; document.getElementById('adminKiosQR').style.display = 'block'; document.getElementById('kiosHeader').style.display = 'none'; document.body.style.backgroundColor = "#ffffff"; jalankanKiosQR(); 
+    isModeKioskMurni = true; 
+    document.getElementById('adminKiosQR').style.display = 'block'; 
+    document.getElementById('kiosHeader').style.display = 'none'; 
+    document.body.style.backgroundColor = "#ffffff"; 
+    jalankanKiosQR(); 
   } else if (view === 'admin') {
-    isModeKioskMurni = false; document.getElementById('loginSection').style.display = 'flex';
-    document.getElementById('loginSection').style.background = "linear-gradient(45deg, #1e293b, #0f172a, #1e293b, #020617)"; document.querySelector('.glass-card').style.background = "rgba(255, 255, 255, 0.85)"; document.querySelector('.app-name').innerText = "Portal Admin HRD"; document.querySelector('.logo-icon').style.background = "linear-gradient(135deg, #3b82f6, #1d4ed8)"; document.querySelector('.logo-icon').style.webkitBackgroundClip = "text"; document.querySelector('.btn-login').style.background = "linear-gradient(135deg, #3b82f6, #1d4ed8)"; document.querySelectorAll('.form-label')[0].innerText = "ID Admin Sistem"; document.getElementById('nik').placeholder = "Ketik ID Admin Anda...";
+    isModeKioskMurni = false; 
+    document.getElementById('loginSection').style.display = 'flex';
+    document.getElementById('loginSection').style.background = "linear-gradient(45deg, #1e293b, #0f172a, #1e293b, #020617)"; 
+    document.querySelector('.glass-card').style.background = "rgba(255, 255, 255, 0.85)"; 
+    document.querySelector('.app-name').innerText = "Portal Admin HRD"; 
+    document.querySelector('.logo-icon').style.background = "linear-gradient(135deg, #3b82f6, #1d4ed8)"; 
+    document.querySelector('.logo-icon').style.webkitBackgroundClip = "text"; 
+    document.querySelector('.btn-login').style.background = "linear-gradient(135deg, #3b82f6, #1d4ed8)"; 
+    document.querySelectorAll('.form-label')[0].innerText = "ID Admin Sistem"; 
+    document.getElementById('nik').placeholder = "Ketik ID Admin Anda...";
   } else {
-    isModeKioskMurni = false; document.getElementById('loginSection').style.display = 'flex';
-    document.getElementById('loginSection').style.background = "linear-gradient(45deg, #ffecd2, #fcb69f, #ffecd2, #fff1eb)"; document.querySelector('.glass-card').style.background = "rgba(255, 255, 255, 0.4)"; document.querySelector('.app-name').innerText = "Akarsa Employee"; document.querySelector('.logo-icon').style.background = "linear-gradient(135deg, #ff416c, #ff4b2b)"; document.querySelector('.logo-icon').style.webkitBackgroundClip = "text"; document.querySelector('.btn-login').style.background = "linear-gradient(135deg, #ff416c, #ff4b2b)"; document.querySelectorAll('.form-label')[0].innerText = "ID/NIK Karyawan"; document.getElementById('nik').placeholder = "Ketik NIK Anda...";
+    isModeKioskMurni = false; 
+    document.getElementById('loginSection').style.display = 'flex';
+    document.getElementById('loginSection').style.background = "linear-gradient(45deg, #ffecd2, #fcb69f, #ffecd2, #fff1eb)"; 
+    document.querySelector('.glass-card').style.background = "rgba(255, 255, 255, 0.4)"; 
+    document.querySelector('.app-name').innerText = "Akarsa Employee"; 
+    document.querySelector('.logo-icon').style.background = "linear-gradient(135deg, #ff416c, #ff4b2b)"; 
+    document.querySelector('.logo-icon').style.webkitBackgroundClip = "text"; 
+    document.querySelector('.btn-login').style.background = "linear-gradient(135deg, #ff416c, #ff4b2b)"; 
+    document.querySelectorAll('.form-label')[0].innerText = "ID/NIK Karyawan"; 
+    document.getElementById('nik').placeholder = "Ketik NIK Anda...";
   }
 }
 window.addEventListener('DOMContentLoaded', aturLaluLintasTampilan);
