@@ -190,7 +190,7 @@ function updateQRCode() {
   const container = document.getElementById('qrContainer');
   container.innerHTML = ""; 
   const timeWindow = Math.floor(Date.now() / 15000); 
-  const tokenQR = "AKARSA-TOTP-" + timeWindow; 
+  const tokenQR = "AKARSA_VALID_" + timeWindow; 
   new QRCode(container, {
     text: tokenQR, width: 240, height: 240,
     colorDark : "#ea384d", colorLight : "#ffffff", correctLevel : QRCode.CorrectLevel.H 
